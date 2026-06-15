@@ -53,6 +53,7 @@ export interface Step {
   step: number
   narration: string
   caption?: string // short on-screen caption; falls back to narration
+  codeLines?: number[] // 1-based lines of the concept's code snippet active this step
   diagram_state: DiagramState
 }
 
@@ -72,4 +73,6 @@ export interface ConceptConfig {
   tags: string[]
   analogy: string // "think of it like…" — an everyday metaphor
   scenario: string // "you'll hit this when…" — a concrete dev situation
+  code?: string // a real code snippet the walkthrough steps through
+  codeFile?: string // filename shown in the code panel header
 }

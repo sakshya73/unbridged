@@ -9,6 +9,7 @@ import { conceptSteps } from "@/lib/data"
 import { Step, DiagramState } from "@/lib/types"
 import { speak, stopSpeaking, voiceSupported, warmVoices } from "@/lib/speech"
 import DiagramCanvas from "@/components/DiagramCanvas"
+import CodePanel from "@/components/CodePanel"
 import { getPlayground } from "@/components/playgrounds"
 
 interface Props {
@@ -180,8 +181,19 @@ export default function LearnPage({ params }: Props) {
               </motion.button>
             </motion.div>
           ) : (
-            <div className="w-full h-full max-w-4xl flex items-center justify-center">
-              <DiagramCanvas state={diagramState} />
+            <div className="w-full h-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-5">
+              {concept.code && (
+                <div className="w-full lg:w-[330px] shrink-0">
+                  <CodePanel
+                    code={concept.code}
+                    filename={concept.codeFile}
+                    activeLines={current?.codeLines ?? []}
+                  />
+                </div>
+              )}
+              <div className="flex-1 w-full flex items-center justify-center">
+                <DiagramCanvas state={diagramState} />
+              </div>
             </div>
           )}
 

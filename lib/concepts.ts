@@ -11,6 +11,16 @@ export const concepts: ConceptConfig[] = [
       "Two people who don't share a language, passing handwritten notes through a translator. It works — but every note has to be written down, carried across, and read aloud.",
     scenario:
       "You'll feel it when a heavy JSON.parse or a big list calculation on the JS thread makes a swipe or animation stutter.",
+    codeFile: "LikeButton.tsx",
+    code: `function LikeButton() {
+  const [likes, setLikes] = useState(0)
+
+  return (
+    <Pressable onPress={() => setLikes(likes + 1)}>
+      <Text>♥ {likes} likes</Text>
+    </Pressable>
+  )
+}`,
   },
   {
     id: "jsi",

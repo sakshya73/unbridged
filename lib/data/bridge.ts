@@ -42,12 +42,14 @@ const rails: DiagramEdge[] = [
 export const bridgeSteps: Step[] = [
   {
     step: 1,
+    codeLines: [1, 2],
     caption: "Your app runs in two worlds. On the left, the JS thread runs all your React code.",
     narration: "Your app runs in two worlds. On the left, the JS thread runs all your React code.",
     diagram_state: { nodes: [js()], edges: [], highlighted: ["js"], annotations: [] },
   },
   {
     step: 2,
+    codeLines: [6],
     caption: "On the right, the native thread owns the real UI — actual iOS and Android views.",
     narration: "On the right, the native thread owns the real UI — actual iOS and Android views.",
     diagram_state: { nodes: [js(), native()], edges: [], highlighted: ["native"], annotations: [] },
@@ -71,6 +73,7 @@ export const bridgeSteps: Step[] = [
   },
   {
     step: 5,
+    codeLines: [6],
     caption: "Say your JS renders <Text>Hi</Text>. It needs native to build a real text view.",
     narration: "Say your JS renders a Text element. It needs the native side to build a real text view.",
     diagram_state: {
@@ -82,6 +85,7 @@ export const bridgeSteps: Step[] = [
   },
   {
     step: 6,
+    codeLines: [6],
     caption: "That command can't cross as a live object — it's serialized into a JSON message.",
     narration: "That command can't cross as a live object, so it's serialized into a JSON message.",
     diagram_state: {
@@ -94,6 +98,7 @@ export const bridgeSteps: Step[] = [
   },
   {
     step: 7,
+    codeLines: [6],
     caption: "Messages don't cross instantly. They queue up and are sent across in batches — async.",
     narration: "Messages don't cross instantly. They queue up and get sent across in batches, asynchronously.",
     diagram_state: {
@@ -110,6 +115,7 @@ export const bridgeSteps: Step[] = [
   },
   {
     step: 8,
+    codeLines: [6],
     caption: "The batch travels across the bridge to the native side.",
     narration: "The batch travels across the bridge to the native side.",
     diagram_state: {
@@ -122,6 +128,7 @@ export const bridgeSteps: Step[] = [
   },
   {
     step: 9,
+    codeLines: [6],
     caption: "Native deserializes the JSON, builds the real view, and your text appears on screen.",
     narration: "The native side deserializes the JSON, builds the real view, and your text appears on screen.",
     diagram_state: {
@@ -134,6 +141,7 @@ export const bridgeSteps: Step[] = [
   },
   {
     step: 10,
+    codeLines: [5],
     caption: "Taps go back the same way — native serializes the event and sends it to your JS handler.",
     narration: "Taps go back the same way: native serializes the event and sends it across to your JS handler.",
     diagram_state: {
@@ -160,6 +168,7 @@ export const bridgeSteps: Step[] = [
   },
   {
     step: 12,
+    codeLines: [5],
     caption: "If the JS thread is busy, the queue backs up, native waits, and you drop frames.",
     narration: "If the JS thread is busy with heavy work, the queue backs up, the native side waits, and frames drop.",
     diagram_state: {
