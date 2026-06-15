@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# unbridged
 
-## Getting Started
+Most of us can ship a React Native app without ever being able to explain how it actually runs. We lean on the framework, the work gets done, and then an interview asks "so how does the bridge work?" and the answer is a shrug.
 
-First, run the development server:
+unbridged is the fix. Pick a concept — the Bridge, JSI, Hermes, the thread model — and watch it drawn out one step at a time, with a short caption (and optional voice) for each move. Where a concept has a real "feel" to it, there's a playground you can poke at. The Bridge one, for example, lets you flip between async and synchronous mode and watch the phone freeze, so "why is it async?" stops being a thing you memorize.
+
+Everything is hardcoded. There's no AI call and no API key, so it runs for free and works offline.
+
+## Run it
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To build:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+## What's inside
 
-To learn more about Next.js, take a look at the following resources:
+- **Walkthroughs** — each concept is a sequence of steps. A diagram builds up as you go, with a caption underneath and, where it helps, a "key term" or "why" note so you don't have to look anything up elsewhere.
+- **Code panel** — a real snippet sits beside the diagram, and the relevant lines light up as the explanation reaches them.
+- **Playgrounds** — hands-on sandboxes for the concepts that are easier to feel than to read.
+- **Voice** — narration via the browser's built-in speech, toggleable. Keyboard arrows step through.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Concepts so far: the Bridge (with a playground), the Three Threads, JSI / New Architecture, component lifecycle, useState, useEffect, FlatList, Hermes, Metro, navigation, and the Animated API.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Stack
 
-## Deploy on Vercel
+Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, and Framer Motion for the SVG animation. Narration uses the Web Speech API.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Adding or editing a concept
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The conventions, the data model, and the project map live in [`AGENTS.md`](./AGENTS.md). The short version: a concept is a metadata entry in `lib/concepts.ts`, a steps file in `lib/data/`, and an optional playground in `components/playgrounds/`.
