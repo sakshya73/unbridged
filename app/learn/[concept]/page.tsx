@@ -1,12 +1,13 @@
 "use client"
 
-import { use, useState, useEffect, useCallback } from "react"
+import { use, useState, useEffect, useCallback, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { getConcept } from "@/lib/concepts"
 import { conceptSteps } from "@/lib/data"
 import { Step, DiagramState } from "@/lib/types"
+import { speak, stopSpeaking, voiceSupported, warmVoices } from "@/lib/speech"
 import DiagramCanvas from "@/components/DiagramCanvas"
 
 interface Props {
@@ -26,21 +27,41 @@ export default function LearnPage({ params }: Props) {
   const [index, setIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [started, setStarted] = useState(false)
+  const [voice, setVoice] = useState(true)
+  const speakSeq = useRef(0)
 
   const current = steps[index]
   const diagramState: DiagramState | null = current?.diagram_state ?? null
   const caption = current?.caption ?? current?.narration ?? ""
   const atEnd = index >= steps.length - 1
 
+  // warm up the browser voice list once
+  useEffect(() => warmVoices(), [])
+  // stop any speech when leaving the page
+  useEffect(() => () => stopSpeaking(), [])
+
+  // Advance loop: voice-driven when enabled (advance when narration finishes),
+  // otherwise a reading-paced timer.
   useEffect(() => {
     if (!isPlaying) return
-    if (atEnd) {
-      setIsPlaying(false)
-      return
+    const last = index >= steps.length - 1
+    const advance = () => {
+      setIndex((i) => (i < steps.length - 1 ? i + 1 : i))
+      if (last) setIsPlaying(false)
     }
-    const t = setTimeout(() => setIndex((i) => i + 1), dwellFor(caption))
+    if (voice && voiceSupported()) {
+      const seq = ++speakSeq.current
+      speak(caption, () => {
+        if (seq === speakSeq.current) advance()
+      })
+      return () => {
+        speakSeq.current++
+        stopSpeaking()
+      }
+    }
+    const t = setTimeout(advance, dwellFor(caption))
     return () => clearTimeout(t)
-  }, [isPlaying, index, atEnd, caption])
+  }, [isPlaying, index, voice, caption, steps.length])
 
   const play = useCallback(() => {
     if (!started) setStarted(true)
@@ -131,8 +152,16 @@ export default function LearnPage({ params }: Props) {
 
         {/* control bar */}
         <div className="border-t border-line bg-paper-2 px-6 py-3.5 flex items-center justify-between gap-4">
-          {/* prev / restart */}
+          {/* voice / prev / restart */}
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setVoice((v) => !v)}
+              className="w-9 h-9 rounded-lg text-ink-soft hover:text-ink hover:bg-ink/5 transition-all flex items-center justify-center"
+              title={voice ? "mute narration" : "unmute narration"}
+              style={voice ? { color: "var(--accent)" } : undefined}
+            >
+              {voice ? "🔊" : "🔇"}
+            </button>
             <button
               onClick={() => goTo(0)}
               disabled={!started}
