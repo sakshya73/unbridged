@@ -151,21 +151,34 @@ export default function LearnPage({ params }: Props) {
           )}
 
           {!started ? (
-            <motion.button
-              onClick={play}
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              className="flex flex-col items-center gap-4 group"
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col items-center gap-6 max-w-lg px-4"
             >
-              <div className="w-20 h-20 rounded-full bg-paper-2 border border-line shadow-[0_10px_30px_-10px_rgba(35,39,47,0.3)] flex items-center justify-center group-hover:border-accent transition-colors">
-                <svg className="w-7 h-7 ml-1" viewBox="0 0 24 24" fill="var(--accent)">
-                  <path d="M8 5.14v14l11-7-11-7z" />
-                </svg>
+              <div className="w-full bg-paper-2 border border-line rounded-2xl p-5 text-left shadow-[0_10px_30px_-16px_rgba(35,39,47,0.3)]">
+                <p className="text-[11px] font-mono uppercase tracking-wider text-ink-faint mb-2">
+                  Think of it like
+                </p>
+                <p className="font-display text-[17px] leading-relaxed text-ink">{concept.analogy}</p>
+                <div className="mt-4 pt-4 border-t border-line">
+                  <p className="text-[11px] font-mono uppercase tracking-wider text-ink-faint mb-1.5">
+                    You&apos;ll hit this when
+                  </p>
+                  <p className="text-sm text-ink-soft leading-relaxed">{concept.scenario}</p>
+                </div>
               </div>
-              <span className="text-sm text-ink-soft">{steps.length} steps · watch it explained</span>
-            </motion.button>
+              <motion.button
+                onClick={play}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-6 py-3 rounded-xl text-white text-sm font-semibold flex items-center gap-2 shadow-[0_4px_14px_-4px_rgba(20,158,202,0.5)]"
+                style={{ background: "var(--accent)" }}
+              >
+                ▶ Watch it explained · {steps.length} steps
+              </motion.button>
+            </motion.div>
           ) : (
             <div className="w-full h-full max-w-4xl flex items-center justify-center">
               <DiagramCanvas state={diagramState} />

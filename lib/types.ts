@@ -70,4 +70,6 @@ export interface ConceptConfig {
   description: string
   renderer: RendererType
   tags: string[]
+  analogy: string // "think of it like…" — an everyday metaphor
+  scenario: string // "you'll hit this when…" — a concrete dev situation
 }
