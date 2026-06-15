@@ -93,6 +93,29 @@ export default function LearnPage({ params }: Props) {
     setIndex(Math.max(0, Math.min(i, steps.length - 1)))
   }
 
+  // keyboard navigation (walkthrough only): ← / → step, space play-pause
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (mode === "play") return
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === "INPUT" || tag === "TEXTAREA") return
+      if (e.key === "ArrowRight") {
+        e.preventDefault()
+        if (!started) setStarted(true)
+        else goTo(index + 1)
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault()
+        if (started) goTo(index - 1)
+      } else if (e.key === " ") {
+        e.preventDefault()
+        if (isPlaying) setIsPlaying(false)
+        else play()
+      }
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [mode, started, index, steps.length, isPlaying, play])
+
   if (!concept) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -146,7 +169,8 @@ export default function LearnPage({ params }: Props) {
         <div className="relative flex-1 bg-dots flex items-center justify-center p-4 sm:p-10 min-h-[440px]">
           {/* step counter */}
           {started && (
-            <span className="absolute top-4 right-5 text-xs font-mono text-ink-faint">
+            <span className="absolute top-4 right-5 text-xs font-mono text-ink-faint flex items-center gap-2.5">
+              <span className="hidden sm:inline opacity-60">← → to step</span>
               {String(index + 1).padStart(2, "0")} / {String(steps.length).padStart(2, "0")}
             </span>
           )}
