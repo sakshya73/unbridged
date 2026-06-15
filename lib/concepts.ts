@@ -23,6 +23,17 @@ export const concepts: ConceptConfig[] = [
 }`,
   },
   {
+    id: "threads",
+    title: "The Three Threads",
+    description: "Why React Native splits work across the JS, layout, and main threads",
+    renderer: "ThreadDiagram",
+    tags: ["architecture", "core", "intermediate"],
+    analogy:
+      "A kitchen line: one cook reads the tickets, another plates each dish, a third runs the food out and works the room. Because the jobs are split, the dining room keeps moving even when the ticket-reader is slammed.",
+    scenario:
+      "Why a list keeps scrolling smoothly even while a heavy calculation runs in your JavaScript: different threads handle different jobs.",
+  },
+  {
     id: "jsi",
     title: "New Architecture & JSI",
     description: "Direct synchronous JS-to-Native calls without the Bridge",

@@ -7,6 +7,7 @@ import { conceptSteps } from "@/lib/data"
 
 const ACCENT: Record<string, string> = {
   bridge: "#D97706",
+  threads: "#7C3AED",
   jsi: "#8B5CF6",
   lifecycle: "#059669",
   usestate: "#4F46E5",

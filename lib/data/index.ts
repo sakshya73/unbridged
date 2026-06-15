@@ -1,5 +1,6 @@
 import { Step } from "../types"
 import { bridgeSteps } from "./bridge"
+import { threadsSteps } from "./threads"
 import { jsiSteps } from "./jsi"
 import { lifecycleSteps } from "./lifecycle"
 import { usestateSteps } from "./usestate"
@@ -12,6 +13,7 @@ import { animatedSteps } from "./animated"
 
 export const conceptSteps: Record<string, Step[]> = {
   bridge: bridgeSteps,
+  threads: threadsSteps,
   jsi: jsiSteps,
   lifecycle: lifecycleSteps,
   usestate: usestateSteps,
