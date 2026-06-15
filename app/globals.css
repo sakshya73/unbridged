@@ -1,26 +1,58 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* reactnative.dev-inspired light palette */
+  --paper: #f6f7f9; /* page background */
+  --paper-2: #ffffff; /* cards / panels */
+  --ink: #23272f; /* primary text (React slate) */
+  --ink-soft: #545b66; /* secondary text */
+  --ink-faint: #99a1b3; /* tertiary text */
+  --line: #ebecf0; /* hairline borders */
+  --line-strong: #d8dce6; /* stronger borders */
+  --accent: #149eca; /* React blue */
+  --accent-ink: #087ea4; /* darker blue for text on light */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-sans);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Subtle dot grid for the diagram surface */
+.bg-dots {
+  background-color: var(--paper-2);
+  background-image: radial-gradient(#dde1ea 1.1px, transparent 1.1px);
+  background-size: 22px 22px;
+}
+
+.font-display {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* React-blue highlighter underline */
+.ink-underline {
+  background-image: linear-gradient(transparent 62%, color-mix(in srgb, var(--accent) 26%, transparent) 0);
+  background-size: 100% 100%;
+  padding: 0 0.04em;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
 }
