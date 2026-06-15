@@ -143,19 +143,18 @@ export default function BridgePlayground() {
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="flex-1 flex flex-col lg:flex-row items-center gap-4 p-4 min-h-[320px]">
+      <div className="flex-1 flex items-center justify-center px-6 py-4">
+        <div className="w-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-14">
         {/* diagram */}
-        <div className="flex-1 relative w-full flex items-center justify-center">
-          <div className="w-full max-w-2xl">
-            <DiagramRenderer state={state} />
-          </div>
+        <div className="relative flex-1 w-full max-w-2xl">
+          <DiagramRenderer state={state} viewBox="0 126 800 300" />
           <AnimatePresence>
             {busy && dropped > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="absolute top-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-mono font-semibold"
+                className="absolute -top-1 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-mono font-semibold"
                 style={{ background: "#FEE2E2", color: "#DC2626" }}
               >
                 ● {dropped} {dropped === 1 ? "message" : "messages"} stuck
@@ -166,7 +165,7 @@ export default function BridgePlayground() {
 
         {/* phone simulator */}
         <div className="shrink-0">
-          <div className="relative w-[230px] h-[420px] rounded-[34px] bg-ink p-2.5 shadow-[0_20px_50px_-18px_rgba(35,39,47,0.45)]">
+          <div className="relative w-[210px] h-[380px] rounded-[32px] bg-ink p-2.5 shadow-[0_20px_50px_-18px_rgba(35,39,47,0.45)]">
             <div className="relative w-full h-full rounded-[26px] bg-paper overflow-hidden flex flex-col">
               <div className="absolute top-2 left-1/2 -translate-x-1/2 w-14 h-3.5 bg-ink rounded-full z-10" />
               <div className="pt-7 pb-2 text-center border-b border-line bg-paper-2">
@@ -185,7 +184,7 @@ export default function BridgePlayground() {
                 </p>
                 <div className="space-y-1.5">
                   <AnimatePresence initial={false}>
-                    {renders.slice(-6).map((r, i) => (
+                    {renders.slice(-5).map((r, i) => (
                       <motion.div
                         key={`${r}-${i}`}
                         initial={{ opacity: 0, x: -8 }}
@@ -217,6 +216,7 @@ export default function BridgePlayground() {
               </AnimatePresence>
             </div>
           </div>
+        </div>
         </div>
       </div>
 

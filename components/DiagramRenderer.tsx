@@ -266,7 +266,13 @@ function PacketToken({ p }: { p: Packet }) {
   )
 }
 
-export default function DiagramRenderer({ state }: { state: DiagramState }) {
+export default function DiagramRenderer({
+  state,
+  viewBox = `0 0 ${VIEW_W} ${VIEW_H}`,
+}: {
+  state: DiagramState
+  viewBox?: string
+}) {
   const boxes: Record<string, Box> = {}
   for (const n of state.nodes) boxes[n.id] = boxOf(n)
   const highlightSet = new Set(state.highlighted)
@@ -276,7 +282,7 @@ export default function DiagramRenderer({ state }: { state: DiagramState }) {
   )
 
   return (
-    <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+    <svg viewBox={viewBox} className="w-full h-full" preserveAspectRatio="xMidYMid meet">
       <defs>
         <filter id="drop" x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="#1c1a17" floodOpacity="0.16" />
