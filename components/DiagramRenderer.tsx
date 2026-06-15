@@ -247,13 +247,12 @@ function PacketToken({ p }: { p: Packet }) {
       initial={{ x: p.x, y: p.y, opacity: 0, scale: 0.85 }}
       animate={
         travels
-          ? { x: [p.x, p.toX!], y: [p.y, p.toY!], opacity: [0, 1, 1, 0.95], scale: 1 }
+          ? { x: [p.x, p.toX!], y: [p.y, p.toY!], opacity: [0, 1, 1, 1], scale: 1 }
           : { x: p.x, y: p.y, opacity: 1, scale: 1 }
       }
-      exit={{ opacity: 0, scale: 0.85 }}
       transition={
         travels
-          ? { duration: 1.5, ease: "easeInOut", repeat: p.loop ? Infinity : 0, repeatDelay: 0.4 }
+          ? { duration: 1.4, ease: "easeInOut" }
           : { type: "spring", stiffness: 240, damping: 20 }
       }
     >
@@ -317,11 +316,11 @@ export default function DiagramRenderer({ state }: { state: DiagramState }) {
         ))}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {(state.packets ?? []).map((p) => (
-          <PacketToken key={p.id} p={p} />
-        ))}
-      </AnimatePresence>
+      {/* Packets are NOT wrapped in AnimatePresence: when the step changes they
+          unmount instantly (no lingering ghosts from a previous step). */}
+      {(state.packets ?? []).map((p) => (
+        <PacketToken key={`${p.id}-${p.x}-${p.toX ?? "s"}`} p={p} />
+      ))}
 
       <AnimatePresence>
         {state.annotations.map((ann) => (

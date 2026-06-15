@@ -45,22 +45,36 @@ export default function LearnPage({ params }: Props) {
   useEffect(() => {
     if (!isPlaying) return
     const last = index >= steps.length - 1
+    let done = false
     const advance = () => {
+      if (done) return
+      done = true
       setIndex((i) => (i < steps.length - 1 ? i + 1 : i))
       if (last) setIsPlaying(false)
     }
+
     if (voice && voiceSupported()) {
       const seq = ++speakSeq.current
+      const startedAt = Date.now()
+      const MIN_MS = 1600 // never blow past a step faster than this
+      const MAX_MS = 13000 // …but never stall if onend never fires
       speak(caption, () => {
-        if (seq === speakSeq.current) advance()
+        if (seq !== speakSeq.current) return
+        const wait = Math.max(0, MIN_MS - (Date.now() - startedAt))
+        window.setTimeout(() => {
+          if (seq === speakSeq.current) advance()
+        }, wait)
       })
+      const maxFallback = window.setTimeout(advance, MAX_MS)
       return () => {
         speakSeq.current++
+        window.clearTimeout(maxFallback)
         stopSpeaking()
       }
     }
-    const t = setTimeout(advance, dwellFor(caption))
-    return () => clearTimeout(t)
+
+    const t = window.setTimeout(advance, dwellFor(caption))
+    return () => window.clearTimeout(t)
   }, [isPlaying, index, voice, caption, steps.length])
 
   const play = useCallback(() => {
