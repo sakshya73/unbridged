@@ -49,10 +49,20 @@ export interface DiagramState {
   packets?: Packet[]
 }
 
+// A short aside shown beside the caption — a definition, a "why", a gotcha,
+// or a pointer to another concept. Keeps the caption itself short.
+export interface StepNote {
+  label: string // small tag, e.g. "Key term", "Why", "Gotcha", "Try it", "Next"
+  term?: string // optional bolded lead-in, e.g. "Thread"
+  text: string
+  link?: { href: string; label: string } // optional in-app cross-link
+}
+
 export interface Step {
   step: number
   narration: string
   caption?: string // short on-screen caption; falls back to narration
+  note?: StepNote // optional aside (definition / why / cross-link)
   codeLines?: number[] // 1-based lines of the concept's code snippet active this step
   diagram_state: DiagramState
 }

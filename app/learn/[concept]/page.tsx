@@ -37,6 +37,8 @@ export default function LearnPage({ params }: Props) {
   const current = steps[index]
   const diagramState: DiagramState | null = current?.diagram_state ?? null
   const caption = current?.caption ?? current?.narration ?? ""
+  const speakText = current?.narration ?? caption // clean prose for the voice; caption may hold code symbols
+  const note = current?.note
   const atEnd = index >= steps.length - 1
 
   // warm up the browser voice list once
@@ -62,7 +64,7 @@ export default function LearnPage({ params }: Props) {
       const startedAt = Date.now()
       const MIN_MS = 1600 // never blow past a step faster than this
       const MAX_MS = 13000 // …but never stall if onend never fires
-      speak(caption, () => {
+      speak(speakText, () => {
         if (seq !== speakSeq.current) return
         const wait = Math.max(0, MIN_MS - (Date.now() - startedAt))
         window.setTimeout(() => {
@@ -79,7 +81,7 @@ export default function LearnPage({ params }: Props) {
 
     const t = window.setTimeout(advance, dwellFor(caption))
     return () => window.clearTimeout(t)
-  }, [isPlaying, index, voice, caption, steps.length])
+  }, [isPlaying, index, voice, caption, speakText, steps.length])
 
   const play = useCallback(() => {
     if (!started) setStarted(true)
@@ -221,7 +223,7 @@ export default function LearnPage({ params }: Props) {
             </div>
           )}
 
-          {/* in-canvas caption (subtitle) */}
+          {/* in-canvas caption (subtitle) + optional note */}
           {started && (
             <div className="absolute inset-x-0 bottom-5 flex justify-center px-4 pointer-events-none">
               <AnimatePresence mode="wait">
@@ -231,11 +233,37 @@ export default function LearnPage({ params }: Props) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.35 }}
-                  className="max-w-2xl bg-paper-2/95 backdrop-blur-sm border border-line rounded-2xl px-5 py-3.5 shadow-[0_8px_28px_-12px_rgba(35,39,47,0.3)]"
+                  className="w-full max-w-2xl flex flex-col items-stretch gap-2.5"
                 >
-                  <p className="font-display text-[17px] leading-relaxed text-ink text-center text-balance">
-                    {caption}
-                  </p>
+                  {note && (
+                    <div className="pointer-events-auto bg-paper-2/95 backdrop-blur-sm border border-line rounded-xl px-4 py-2.5 shadow-[0_8px_28px_-14px_rgba(35,39,47,0.28)]">
+                      <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: "var(--accent)" }}>
+                        {note.label}
+                      </span>
+                      <p className="text-[13px] text-ink-soft leading-relaxed mt-0.5">
+                        {note.term && <span className="font-semibold text-ink">{note.term}</span>}
+                        {note.term && " — "}
+                        {note.text}
+                        {note.link && (
+                          <>
+                            {" "}
+                            <Link
+                              href={note.link.href}
+                              className="font-medium whitespace-nowrap hover:underline"
+                              style={{ color: "var(--accent)" }}
+                            >
+                              {note.link.label} →
+                            </Link>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  )}
+                  <div className="bg-paper-2/95 backdrop-blur-sm border border-line rounded-2xl px-5 py-3.5 shadow-[0_8px_28px_-12px_rgba(35,39,47,0.3)]">
+                    <p className="font-display text-[17px] leading-relaxed text-ink text-center text-balance">
+                      {caption}
+                    </p>
+                  </div>
                 </motion.div>
               </AnimatePresence>
             </div>
