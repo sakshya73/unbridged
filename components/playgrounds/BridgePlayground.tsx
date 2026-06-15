@@ -23,26 +23,22 @@ const bridgeNode: DiagramNode = {
 type Dir = "out" | "in"
 
 export default function BridgePlayground() {
-  const [busy, setBusy] = useState(false)
-  const [queue, setQueue] = useState<{ id: number; dir: Dir }[]>([])
+  const [sync, setSync] = useState(false) // false = async (how RN really works)
+  const [blocking, setBlocking] = useState(false) // sync mode: JS frozen mid-call
   const [flights, setFlights] = useState<Packet[]>([])
-  const [dropped, setDropped] = useState(0)
   const [pulse, setPulse] = useState<"js" | "native" | null>(null)
-  // what the phone actually shows
   const [likes, setLikes] = useState(0)
   const [renders, setRenders] = useState<string[]>([])
   const idRef = useRef(0)
-  const nextId = () => ++idRef.current
 
-  // the visible effect of a message once it has crossed the bridge
   const applyArrival = useCallback((dir: Dir) => {
     if (dir === "in") setLikes((l) => l + 1)
     else setRenders((r) => [...r, `Text #${r.length + 1}`])
   }, [])
 
   const launch = useCallback(
-    (dir: Dir) => {
-      const id = nextId()
+    (dir: Dir, onArrive?: () => void) => {
+      const id = ++idRef.current
       const from = dir === "out" ? JS_MOUTH : NATIVE_MOUTH
       const to = dir === "out" ? NATIVE_MOUTH : JS_MOUTH
       const lane = dir === "out" ? 0 : 24
@@ -61,56 +57,50 @@ export default function BridgePlayground() {
         setPulse(dir === "out" ? "native" : "js")
         applyArrival(dir)
         window.setTimeout(() => setPulse(null), 700)
+        onArrive?.()
       }, FLIGHT_MS)
     },
     [applyArrival]
   )
 
-  const send = useCallback(
+  const fire = useCallback(
     (dir: Dir) => {
-      if (busy) {
-        setQueue((q) => [...q, { id: nextId(), dir }])
-        setDropped((d) => d + 1)
+      if (sync) {
+        if (blocking) return // JS is frozen — you literally cannot do anything
+        setBlocking(true)
+        launch(dir, () => setBlocking(false))
       } else {
-        launch(dir)
+        launch(dir) // fire and keep running
       }
     },
-    [busy, launch]
+    [sync, blocking, launch]
   )
 
-  const toggleBusy = useCallback(() => {
-    setBusy((b) => {
-      const now = !b
-      if (!now) {
-        setQueue((q) => {
-          q.forEach((msg, i) => window.setTimeout(() => launch(msg.dir), i * 300))
-          return []
-        })
-      }
-      return now
-    })
-  }, [launch])
+  const switchMode = (toSync: boolean) => {
+    setSync(toSync)
+    setBlocking(false)
+  }
 
   const reset = () => {
-    setBusy(false)
-    setQueue([])
+    setBlocking(false)
     setFlights([])
-    setDropped(0)
     setPulse(null)
     setLikes(0)
     setRenders([])
   }
 
-  // ---- diagram state ----
+  const frozen = sync && blocking
+
+  // ---- diagram ----
   const js: DiagramNode = {
     id: "js",
-    label: busy ? "JS Thread\n(busy — blocked)" : "JS Thread\nyour React code",
+    label: frozen ? "JS Thread\n(frozen — waiting)" : "JS Thread\nyour React code",
     x: 60,
     y: 150,
     width: 200,
     height: 120,
     style: "box",
-    color: busy ? "#DC2626" : "#4F46E5",
+    color: frozen ? "#DC2626" : "#4F46E5",
   }
   const native: DiagramNode = {
     id: "native",
@@ -123,118 +113,113 @@ export default function BridgePlayground() {
     color: "#059669",
   }
 
-  const outQueue = queue.filter((m) => m.dir === "out")
-  const inQueue = queue.filter((m) => m.dir === "in")
-  const queuePackets: Packet[] = [
-    ...outQueue.slice(0, 5).map((m, i) => ({ id: `q${m.id}`, x: 285, y: 150 + i * 25, label: "{ create }", color: "#DC2626" })),
-    ...inQueue.slice(0, 5).map((m, i) => ({ id: `q${m.id}`, x: 515, y: 150 + i * 25, label: "{ onPress }", color: "#DC2626" })),
-  ]
-
   const state: DiagramState = {
     nodes: [js, bridgeNode, native],
     edges: [
       { id: "r1", from: "js", to: "bridge", color: "#D8DCE6" },
       { id: "r2", from: "bridge", to: "native", color: "#D8DCE6" },
     ],
-    highlighted: pulse ? [pulse] : busy ? ["js"] : [],
-    annotations: busy ? [{ id: "warn", text: "JS blocked → nothing reaches the screen", x: 400, y: 410, color: "#DC2626" }] : [],
-    packets: [...queuePackets, ...flights],
+    highlighted: pulse ? [pulse] : frozen ? ["js"] : [],
+    annotations: frozen
+      ? [{ id: "f", text: "JS is frozen until native replies", x: 400, y: 405, color: "#DC2626" }]
+      : sync
+      ? [{ id: "s", text: "Synchronous: every call blocks the JS thread", x: 400, y: 405, color: "#D97706" }]
+      : [{ id: "a", text: "Async: JS fires a message and keeps running", x: 400, y: 405, color: "#059669" }],
+    packets: flights,
   }
 
   return (
     <div className="w-full flex-1 min-h-0 flex flex-col">
       <div className="flex-1 flex items-center justify-center px-6 py-4">
         <div className="w-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-14">
-        {/* diagram */}
-        <div className="relative flex-1 w-full max-w-2xl">
-          <DiagramRenderer state={state} viewBox="0 126 800 300" />
-          <AnimatePresence>
-            {busy && dropped > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="absolute -top-1 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-mono font-semibold"
-                style={{ background: "#FEE2E2", color: "#DC2626" }}
-              >
-                ● {dropped} {dropped === 1 ? "message" : "messages"} stuck
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+          {/* diagram */}
+          <div className="relative flex-1 w-full max-w-2xl">
+            <DiagramRenderer state={state} viewBox="0 126 800 300" />
+          </div>
 
-        {/* phone simulator */}
-        <div className="shrink-0">
-          <div className="relative w-[210px] h-[380px] rounded-[32px] bg-ink p-2.5 shadow-[0_20px_50px_-18px_rgba(35,39,47,0.45)]">
-            <div className="relative w-full h-full rounded-[26px] bg-paper overflow-hidden flex flex-col">
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-14 h-3.5 bg-ink rounded-full z-10" />
-              <div className="pt-7 pb-2 text-center border-b border-line bg-paper-2">
-                <p className="font-semibold text-sm">My App</p>
-              </div>
-              <div className="flex-1 p-4 overflow-hidden">
-                <button
-                  onClick={() => send("in")}
-                  className="w-full py-3 rounded-xl text-white font-semibold text-sm mb-3 active:scale-95 transition-transform"
-                  style={{ background: "var(--accent)" }}
-                >
-                  ❤ Like
-                </button>
-                <p className="text-xs text-ink-soft mb-3">
-                  Likes: <span className="font-bold text-ink text-sm">{likes}</span>
-                </p>
-                <div className="space-y-1.5">
-                  <AnimatePresence initial={false}>
-                    {renders.slice(-5).map((r, i) => (
-                      <motion.div
-                        key={`${r}-${i}`}
-                        initial={{ opacity: 0, x: -8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="text-xs bg-paper-2 border border-line rounded-lg px-2.5 py-1.5 font-mono text-ink-soft"
-                      >
-                        {r}
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
+          {/* phone */}
+          <div className="shrink-0">
+            <div className="relative w-[210px] h-[380px] rounded-[32px] bg-ink p-2.5 shadow-[0_20px_50px_-18px_rgba(35,39,47,0.45)]">
+              <div className="relative w-full h-full rounded-[26px] bg-paper overflow-hidden flex flex-col">
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-14 h-3.5 bg-ink rounded-full z-10" />
+                <div className="pt-7 pb-2 text-center border-b border-line bg-paper-2">
+                  <p className="font-semibold text-sm">My App</p>
                 </div>
-              </div>
-
-              {/* frozen overlay — taps still queue */}
-              <AnimatePresence>
-                {busy && (
-                  <motion.button
-                    onClick={() => send("in")}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-white/55 backdrop-blur-[1px] flex flex-col items-center justify-center gap-1 cursor-pointer"
+                <div className="flex-1 p-4 overflow-hidden">
+                  <button
+                    onClick={() => fire("in")}
+                    disabled={frozen}
+                    className="w-full py-3 rounded-xl text-white font-semibold text-sm mb-3 active:scale-95 transition-transform disabled:opacity-60"
+                    style={{ background: "var(--accent)" }}
                   >
-                    <span className="text-2xl">🥶</span>
-                    <span className="text-xs font-semibold text-red-600">UI frozen</span>
-                    <span className="text-[10px] text-ink-soft">tap anyway — it queues</span>
-                  </motion.button>
-                )}
-              </AnimatePresence>
+                    ❤ Like
+                  </button>
+                  <p className="text-xs text-ink-soft mb-3">
+                    Likes: <span className="font-bold text-ink text-sm">{likes}</span>
+                  </p>
+                  <div className="space-y-1.5">
+                    <AnimatePresence initial={false}>
+                      {renders.slice(-5).map((r, i) => (
+                        <motion.div
+                          key={`${r}-${i}`}
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="text-xs bg-paper-2 border border-line rounded-lg px-2.5 py-1.5 font-mono text-ink-soft"
+                        >
+                          {r}
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                </div>
+
+                <AnimatePresence>
+                  {frozen && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex flex-col items-center justify-center gap-1"
+                    >
+                      <span className="text-2xl">🥶</span>
+                      <span className="text-xs font-semibold text-red-600">frozen</span>
+                      <span className="text-[10px] text-ink-soft">waiting for native…</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
 
       {/* controls */}
       <div className="border-t border-line bg-paper-2 px-5 py-4">
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <span className="text-xs text-ink-faint mr-1">Bridge mode</span>
+          <div className="flex bg-ink/[0.05] rounded-lg p-0.5 text-sm">
+            <button
+              onClick={() => switchMode(false)}
+              className={`px-3 py-1 rounded-md transition-all ${!sync ? "bg-paper-2 text-ink font-medium shadow-sm" : "text-ink-soft hover:text-ink"}`}
+            >
+              ⚡ Async (real)
+            </button>
+            <button
+              onClick={() => switchMode(true)}
+              className={`px-3 py-1 rounded-md transition-all ${sync ? "bg-paper-2 text-ink font-medium shadow-sm" : "text-ink-soft hover:text-ink"}`}
+            >
+              🐢 Synchronous
+            </button>
+          </div>
+        </div>
+
         <div className="flex flex-wrap items-center justify-center gap-3">
           <button
-            onClick={() => send("out")}
-            className="px-4 py-2 rounded-xl text-sm font-medium border border-line bg-white hover:border-line-strong hover:-translate-y-0.5 transition-all"
+            onClick={() => fire("out")}
+            disabled={frozen}
+            className="px-4 py-2 rounded-xl text-sm font-medium border border-line bg-white hover:border-line-strong hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0"
           >
             📤 JS renders a <span className="font-mono text-[13px]">&lt;Text&gt;</span>
-          </button>
-          <button
-            onClick={toggleBusy}
-            className="px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-            style={{ background: busy ? "#DC2626" : "#23272f" }}
-          >
-            {busy ? "🧱 unblock JS thread" : "🧱 Block the JS thread"}
           </button>
           <button
             onClick={reset}
@@ -243,10 +228,19 @@ export default function BridgePlayground() {
             ↺ reset
           </button>
         </div>
-        <p className="mt-3 text-center text-sm text-ink-soft max-w-xl mx-auto">
-          {busy
-            ? `Tap the frozen phone — nothing happens, the events just pile up (${queue.length} queued). Unblock and watch them all fire at once.`
-            : "Tap ❤ Like or render a <Text>, and watch the message cross the bridge before it shows on screen. Then block the JS thread and try again."}
+
+        <p className="mt-3 text-center text-sm text-ink-soft max-w-2xl mx-auto leading-relaxed">
+          {sync ? (
+            <>
+              <b className="text-ink">Synchronous (a phone call):</b> every call freezes the JS thread until native
+              replies — try tapping while it&apos;s frozen, nothing happens. This is why RN <i>doesn&apos;t</i> work this way.
+            </>
+          ) : (
+            <>
+              <b className="text-ink">Async (texting):</b> JS fires a message and keeps running — spam the buttons,
+              the app stays responsive. The replies arrive a moment later. Now flip to Synchronous to feel the difference.
+            </>
+          )}
         </p>
       </div>
     </div>
