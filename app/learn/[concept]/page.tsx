@@ -9,6 +9,7 @@ import { conceptSteps } from "@/lib/data"
 import { Step, DiagramState } from "@/lib/types"
 import { speak, stopSpeaking, voiceSupported, warmVoices } from "@/lib/speech"
 import DiagramCanvas from "@/components/DiagramCanvas"
+import { getPlayground } from "@/components/playgrounds"
 
 interface Props {
   params: Promise<{ concept: string }>
@@ -23,11 +24,13 @@ export default function LearnPage({ params }: Props) {
   const router = useRouter()
   const concept = getConcept(conceptId)
   const steps: Step[] = conceptSteps[conceptId] ?? []
+  const Playground = getPlayground(conceptId)
 
   const [index, setIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [started, setStarted] = useState(false)
   const [voice, setVoice] = useState(true)
+  const [mode, setMode] = useState<"walk" | "play">("walk")
   const speakSeq = useRef(0)
 
   const current = steps[index]
@@ -108,11 +111,37 @@ export default function LearnPage({ params }: Props) {
           ← all concepts
         </button>
         <h1 className="font-display text-base font-semibold tracking-tight">{concept.title}</h1>
-        <div className="w-24 hidden sm:block" />
+        {Playground ? (
+          <div className="flex items-center gap-0.5 bg-ink/[0.05] rounded-lg p-0.5 text-sm">
+            <button
+              onClick={() => setMode("walk")}
+              className={`px-3 py-1 rounded-md transition-all ${mode === "walk" ? "bg-paper-2 text-ink font-medium shadow-sm" : "text-ink-soft hover:text-ink"}`}
+            >
+              Walkthrough
+            </button>
+            <button
+              onClick={() => {
+                setIsPlaying(false)
+                stopSpeaking()
+                setMode("play")
+              }}
+              className={`px-3 py-1 rounded-md transition-all ${mode === "play" ? "bg-paper-2 text-ink font-medium shadow-sm" : "text-ink-soft hover:text-ink"}`}
+            >
+              ✦ Playground
+            </button>
+          </div>
+        ) : (
+          <div className="w-24 hidden sm:block" />
+        )}
       </header>
 
-      {/* board */}
       <main className="flex-1 flex flex-col">
+        {mode === "play" && Playground ? (
+          <div className="flex-1 flex flex-col bg-dots">
+            <Playground />
+          </div>
+        ) : (
+        <>
         <div className="relative flex-1 bg-dots flex items-center justify-center p-4 sm:p-10 min-h-[440px]">
           {/* step counter */}
           {started && (
@@ -226,6 +255,8 @@ export default function LearnPage({ params }: Props) {
             </button>
           </div>
         </div>
+        </>
+        )}
       </main>
     </div>
   )
