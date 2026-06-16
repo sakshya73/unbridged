@@ -1,17 +1,18 @@
 import { Step, DiagramNode, DiagramEdge } from "../types"
 
-const js: DiagramNode = { id: "js", label: "JS Thread\n(Hermes)", x: 60, y: 200, width: 180, height: 84, style: "box", color: "#4F46E5" }
-const native: DiagramNode = { id: "native", label: "Native Thread\nUI + platform APIs", x: 560, y: 200, width: 180, height: 84, style: "box", color: "#059669" }
-const jsi: DiagramNode = { id: "jsi", label: "JSI\nC++ interface", x: 310, y: 128, width: 180, height: 46, style: "pill", color: "#8B5CF6" }
-const turbo: DiagramNode = { id: "turbo", label: "TurboModules\nlazy native modules", x: 560, y: 80, width: 180, height: 60, style: "box", color: "#374151" }
-const fabric: DiagramNode = { id: "fabric", label: "Fabric\nC++ shadow tree", x: 560, y: 330, width: 180, height: 60, style: "box", color: "#3B82F6" }
-const bridge = (on: boolean): DiagramNode => ({ id: "bridge", label: "Old Bridge\n(async JSON)", x: 310, y: 214, width: 180, height: 46, style: "pill", color: on ? "#D97706" : "#9CA3AF" })
+const js: DiagramNode = { id: "js", label: "JS Thread\n(Hermes)", x: 40, y: 210, width: 180, height: 84, style: "box", color: "#4F46E5" }
+const native: DiagramNode = { id: "native", label: "Native Thread\nUI + platform APIs", x: 600, y: 210, width: 180, height: 84, style: "box", color: "#059669" }
+const jsi: DiagramNode = { id: "jsi", label: "JSI\nC++ interface", x: 315, y: 120, width: 170, height: 46, style: "pill", color: "#8B5CF6" }
+const turbo: DiagramNode = { id: "turbo", label: "TurboModules\nlazy native modules", x: 600, y: 40, width: 180, height: 60, style: "box", color: "#374151" }
+const fabric: DiagramNode = { id: "fabric", label: "Fabric\nC++ shadow tree", x: 600, y: 360, width: 180, height: 60, style: "box", color: "#3B82F6" }
+const bridge = (on: boolean): DiagramNode => ({ id: "bridge", label: "Old Bridge\n(async JSON)", x: 315, y: 229, width: 170, height: 46, style: "pill", color: on ? "#D97706" : "#9CA3AF" })
 
-const eSer = (on: boolean): DiagramEdge => ({ id: "e_ser", from: "js", to: "bridge", label: "serialize", dashed: true, animated: on, color: on ? "#FCD34D" : "#CBD5E1" })
-const eDes = (on: boolean): DiagramEdge => ({ id: "e_des", from: "bridge", to: "native", label: "deserialize", dashed: true, animated: on, color: on ? "#FCD34D" : "#CBD5E1" })
-const eDirect: DiagramEdge = { id: "e_direct", from: "js", to: "native", label: "direct call (HostObject)", animated: true, color: "#818CF8" }
-const eTurbo: DiagramEdge = { id: "e_turbo", from: "jsi", to: "turbo", label: "exposed via JSI", color: "#8B5CF6" }
-const eFabric: DiagramEdge = { id: "e_fabric", from: "js", to: "fabric", label: "commit shadow tree (JSI)", animated: true, color: "#818CF8" }
+// Old-bridge edges: labelled only while the bridge is the live path (step 3).
+const eSer = (on: boolean): DiagramEdge => ({ id: "e_ser", from: "js", to: "bridge", label: on ? "serialize" : undefined, dashed: true, animated: on, color: on ? "#FCD34D" : "#CBD5E1" })
+const eDes = (on: boolean): DiagramEdge => ({ id: "e_des", from: "bridge", to: "native", label: on ? "deserialize" : undefined, dashed: true, animated: on, color: on ? "#FCD34D" : "#CBD5E1" })
+const eDirect: DiagramEdge = { id: "e_direct", from: "js", to: "native", label: "direct call", animated: true, color: "#818CF8" }
+const eTurbo: DiagramEdge = { id: "e_turbo", from: "jsi", to: "turbo", color: "#8B5CF6" } // unlabeled — node says it
+const eFabric: DiagramEdge = { id: "e_fabric", from: "jsi", to: "fabric", color: "#3B82F6" } // unlabeled
 const eBack: DiagramEdge = { id: "e_back", from: "native", to: "js", label: "sync reply", dashed: true, animated: true, color: "#FCD34D" }
 
 export const jsiSteps: Step[] = [
@@ -84,8 +85,8 @@ export const jsiSteps: Step[] = [
       },
     ],
     diagram_state: {
-      nodes: [js, bridge(false), native, jsi],
-      edges: [eSer(false), eDes(false), eDirect],
+      nodes: [js, native, jsi],
+      edges: [eDirect],
       highlighted: ["js", "native", "jsi"],
       annotations: [{ id: "a", text: "HostObject: native methods JS calls directly", x: 400, y: 455, color: "#8B5CF6" }],
     },
@@ -104,12 +105,12 @@ export const jsiSteps: Step[] = [
       {
         label: "Key term",
         term: "Codegen",
-        text: "at build time it reads your TypeScript spec files and generates the typed C++/Java/Obj-C glue that TurboModules and Fabric are checked against. That's where 'type-safe' comes from — and one reason the New Architecture needs a native rebuild, not just a JS update.",
+        text: "at build time it reads your TypeScript spec files and generates the typed C++/Java/Obj-C glue that TurboModules and Fabric are checked against. That's where 'type-safe' comes from — and one reason the New Architecture needs a native rebuild.",
       },
     ],
     diagram_state: {
-      nodes: [js, bridge(false), native, jsi, turbo],
-      edges: [eSer(false), eDes(false), eDirect, eTurbo],
+      nodes: [js, native, jsi, turbo],
+      edges: [eDirect, eTurbo],
       highlighted: ["turbo"],
       annotations: [{ id: "a", text: "TurboModules: lazy + type-safe (via Codegen)", x: 400, y: 455, color: "#374151" }],
     },
@@ -124,8 +125,8 @@ export const jsiSteps: Step[] = [
       link: { href: "/learn/threads", label: "The Three Threads" },
     },
     diagram_state: {
-      nodes: [js, bridge(false), native, jsi, turbo, fabric],
-      edges: [eSer(false), eDes(false), eDirect, eTurbo, eFabric],
+      nodes: [js, native, jsi, turbo, fabric],
+      edges: [eDirect, eTurbo, eFabric],
       highlighted: ["fabric"],
       annotations: [{ id: "a", text: "Fabric: C++ shadow tree, layout can be synchronous", x: 400, y: 455, color: "#3B82F6" }],
     },
@@ -135,8 +136,8 @@ export const jsiSteps: Step[] = [
     caption: "Because the link is synchronous, native can call straight back into JS too — Fabric reading measured layout instantly, with no round-trip queue.",
     narration: "Because the link is synchronous, native can call straight back into JS too, like Fabric reading measured layout instantly, with no round-trip queue.",
     diagram_state: {
-      nodes: [js, bridge(false), native, jsi, turbo, fabric],
-      edges: [eSer(false), eDes(false), eDirect, eTurbo, eFabric, eBack],
+      nodes: [js, native, jsi, turbo, fabric],
+      edges: [eDirect, eTurbo, eFabric, eBack],
       highlighted: ["js", "native"],
       annotations: [{ id: "a", text: "two-way and synchronous — no batched queue", x: 400, y: 455, color: "#818CF8" }],
     },
@@ -153,8 +154,8 @@ export const jsiSteps: Step[] = [
       link: { href: "/learn/animated", label: "Animated API" },
     },
     diagram_state: {
-      nodes: [js, bridge(false), native, jsi, turbo, fabric],
-      edges: [eSer(false), eDes(false), eDirect, eTurbo, eFabric, eBack],
+      nodes: [js, native, jsi, turbo, fabric],
+      edges: [eDirect, eTurbo, eFabric, eBack],
       highlighted: ["native", "fabric"],
       annotations: [{ id: "a", text: "Reanimated worklets run on the UI thread → frame-perfect", x: 400, y: 455, color: "#DB2777" }],
     },
@@ -168,8 +169,8 @@ export const jsiSteps: Step[] = [
       text: "JSI is raw C++ with manual memory, so a bad HostObject can crash the app instead of throwing a JS error. A synchronous call can now block the thread it runs on. Debugging spans JS and C++. And the old bridge still ships alongside as an interop layer for libraries that haven't migrated.",
     },
     diagram_state: {
-      nodes: [js, bridge(false), native, jsi, turbo, fabric],
-      edges: [eSer(false), eDes(false), eDirect, eTurbo, eFabric, eBack],
+      nodes: [js, native, jsi, turbo, fabric],
+      edges: [eDirect, eTurbo, eFabric, eBack],
       highlighted: [],
       annotations: [{ id: "a", text: "the costs: raw C++ memory · sync can block · native rebuild", x: 400, y: 455, color: "#DC2626" }],
     },
