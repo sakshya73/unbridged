@@ -45,11 +45,15 @@ function edgeGeometry(edge: DiagramEdge, boxes: Record<string, Box>) {
   const dx = end.x - start.x
   const dy = end.y - start.y
   const dist = Math.hypot(dx, dy)
-  // perpendicular bow so two opposing edges between the same pair separate visually
-  const sign = edge.from < edge.to ? 1 : -1
-  const bow = Math.min(dist * 0.16, 46) * sign
-  const nx = dist === 0 ? 0 : -dy / dist
-  const ny = dist === 0 ? 0 : dx / dist
+  // Bow the curve perpendicular to its line. The normal is computed from a
+  // CANONICAL endpoint order (lower id → higher id) so an A→B / B→A pair bow to
+  // OPPOSITE sides instead of collapsing onto the same curve.
+  const fwd = edge.from < edge.to
+  const cdx = fwd ? dx : -dx
+  const cdy = fwd ? dy : -dy
+  const nx = dist === 0 ? 0 : -cdy / dist
+  const ny = dist === 0 ? 0 : cdx / dist
+  const bow = Math.min(dist * 0.16, 46) * (fwd ? 1 : -1)
   const mx = (start.x + end.x) / 2 + nx * bow
   const my = (start.y + end.y) / 2 + ny * bow
   const path = `M ${start.x} ${start.y} Q ${mx} ${my} ${end.x} ${end.y}`
