@@ -36,6 +36,37 @@ function NodeMark({ color, size = 16 }: { color: string; size?: number }) {
   )
 }
 
+// A distinct little glyph per concept so cards are scannable at a glance.
+// Falls back to the atom for concepts that don't have a custom one yet.
+function ConceptGlyph({ id, color, size = 22 }: { id: string; color: string; size?: number }) {
+  const p = { stroke: color, strokeWidth: 1.9, fill: "none", strokeLinecap: "round" as const, strokeLinejoin: "round" as const }
+  if (id === "bridge") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+        <path d="M4 17 Q12 7 20 17" {...p} />
+        <path d="M4 17v3M20 17v3M12 12v8" {...p} />
+      </svg>
+    )
+  }
+  if (id === "threads") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+        <path d="M4 8h16M4 12h16M4 16h16" {...p} />
+      </svg>
+    )
+  }
+  if (id === "jsi") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="9" width="5" height="6" rx="1.4" {...p} />
+        <rect x="16" y="9" width="5" height="6" rx="1.4" {...p} />
+        <path d="M9.4 12h5.2M12.7 10.2 14.8 12 12.7 13.8M11.3 10.2 9.2 12 11.3 13.8" {...p} />
+      </svg>
+    )
+  }
+  return <NodeMark color={color} size={size} />
+}
+
 function GitHubIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
@@ -192,23 +223,12 @@ export default function Home() {
                           className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:-rotate-3"
                           style={{ background: `${accent}1A`, boxShadow: `inset 0 0 0 1px ${accent}26` }}
                         >
-                          <NodeMark color={accent} size={22} />
+                          <ConceptGlyph id={concept.id} color={accent} size={22} />
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          {interactive && (
-                            <span
-                              className="text-[10px] font-mono px-1.5 py-0.5 rounded-full inline-flex items-center gap-1"
-                              style={{ color: accent, background: `${accent}14`, boxShadow: `inset 0 0 0 1px ${accent}2e` }}
-                            >
-                              <span className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
-                              live
-                            </span>
-                          )}
-                          <span className="text-[11px] font-mono px-2 py-0.5 rounded-full text-ink-faint bg-line inline-flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full" style={{ background: level.color }} />
-                            {level.label}
-                          </span>
-                        </div>
+                        <span className="text-[11px] font-mono px-2 py-0.5 rounded-full text-ink-faint bg-line inline-flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ background: level.color }} />
+                          {level.label}
+                        </span>
                       </div>
 
                       <h2 className="font-display text-lg font-semibold leading-snug tracking-tight">{concept.title}</h2>
