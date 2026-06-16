@@ -84,8 +84,8 @@ export default function JsiPlayground() {
   return (
     <div className="w-full flex-1 min-h-0 flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6 py-8">
-        <p className="text-sm text-ink-soft text-center">
-          Move your cursor across the pad. The <b className="text-ink">view</b> chases your{" "}
+        <p className="text-sm text-ink-soft text-center max-w-md">
+          Drag across the pad. The <b className="text-ink">view</b> chases your{" "}
           <b className="text-ink">finger</b> — watch how closely it keeps up.
         </p>
 

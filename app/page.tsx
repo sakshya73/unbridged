@@ -130,7 +130,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <nav className="sticky top-0 z-50 bg-paper/80 backdrop-blur-md border-b border-line">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "var(--accent)" }}>
               <NodeMark color="#fff" size={16} />
@@ -139,9 +139,10 @@ export default function Home() {
           </div>
           <a
             href="https://github.com/sakshya73"
-            className="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-ink px-3 py-1.5 rounded-lg border border-transparent hover:bg-paper-2 hover:border-line transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-ink px-2.5 sm:px-3 py-1.5 rounded-lg border border-transparent hover:bg-paper-2 hover:border-line transition-colors shrink-0"
           >
-            <GitHubIcon /> GitHub
+            <GitHubIcon />
+            <span className="hidden sm:inline">GitHub</span>
           </a>
         </div>
       </nav>
@@ -162,7 +163,7 @@ export default function Home() {
               Pick a concept. Watch it drawn out step by step — the Bridge, JSI, Fabric,
               Hermes, the things interviews actually ask about.
             </p>
-            <div className="mt-9 flex items-center gap-4">
+            <div className="mt-9 flex flex-wrap items-center gap-x-4 gap-y-3">
               <Link
                 href="/learn/bridge"
                 className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold shadow-[0_6px_20px_-8px_rgba(20,158,202,0.55)] transition-transform hover:-translate-y-0.5"

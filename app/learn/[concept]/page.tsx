@@ -136,13 +136,13 @@ export default function LearnPage({ params }: Props) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* header */}
-      <header className="flex items-center justify-between px-6 py-3.5 border-b border-line bg-paper-2 z-10">
-        <button onClick={() => router.push("/")} className="text-sm text-ink-soft hover:text-ink transition-colors">
-          ← all concepts
+      <header className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3 border-b border-line bg-paper-2 z-10">
+        <button onClick={() => router.push("/")} className="text-sm text-ink-soft hover:text-ink transition-colors shrink-0 whitespace-nowrap">
+          ←<span className="hidden sm:inline"> all concepts</span>
         </button>
-        <h1 className="font-display text-base font-semibold tracking-tight">{concept.title}</h1>
+        <h1 className="hidden sm:block min-w-0 truncate font-display text-base font-semibold tracking-tight">{concept.title}</h1>
         {Playground ? (
-          <div className="flex items-center gap-0.5 bg-ink/[0.05] rounded-lg p-0.5 text-sm">
+          <div className="flex items-center gap-0.5 bg-ink/[0.05] rounded-lg p-0.5 text-sm shrink-0">
             <button
               onClick={() => setMode("walk")}
               className={`px-3 py-1 rounded-md transition-all ${mode === "walk" ? "bg-paper-2 text-ink font-medium shadow-sm" : "text-ink-soft hover:text-ink"}`}
@@ -256,9 +256,9 @@ export default function LearnPage({ params }: Props) {
               </motion.div>
             </>
           ) : (
-            <div className="w-full h-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-5">
+            <div className="w-full h-full max-w-5xl flex flex-col-reverse lg:flex-row items-center justify-center gap-4 lg:gap-5">
               {concept.code && (
-                <div className="w-full lg:w-[330px] shrink-0">
+                <div className="w-full lg:w-[330px] shrink-0 max-h-[34vh] overflow-auto lg:max-h-none lg:overflow-visible">
                   <CodePanel
                     code={concept.code}
                     filename={concept.codeFile}
@@ -278,7 +278,7 @@ export default function LearnPage({ params }: Props) {
             floors it so the diagram barely shifts between steps, and it grows to
             fit long notes instead of clipping them over the seam. */}
         {started && (
-          <div className="border-t border-line bg-paper-2 px-6 py-4 h-[184px] flex flex-col justify-center overflow-y-auto">
+          <div className="border-t border-line bg-paper-2 px-5 sm:px-6 py-4 min-h-[128px] sm:h-[184px] flex flex-col justify-center overflow-y-auto">
             <AnimatePresence mode="wait">
               <motion.div
                 key={index}
