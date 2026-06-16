@@ -147,6 +147,20 @@ const MemoRow = React.memo(Row) // same props → React bails out, skips re-rend
       "A sticky note that says 'once the room is set up, water the plants' — it runs after the render, not during it, and cleans up before doing it again.",
     scenario:
       "Why your data fetch fires twice or at the wrong moment when the dependency array is wrong.",
+    codeFile: "RoomPresence.tsx",
+    code: `function RoomPresence({ roomId }) {
+  const [online, setOnline] = useState(0)
+
+  useEffect(() => {
+    // setup runs after paint
+    const conn = chatClient.join(roomId)
+    conn.onCount(setOnline)
+
+    return () => conn.leave()      // cleanup: before next effect + on unmount
+  }, [roomId])                     // deps: re-run only when roomId changes
+
+  return <Text>{online} online in {roomId}</Text>
+}`,
   },
   {
     id: "flatlist",

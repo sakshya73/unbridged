@@ -7,6 +7,7 @@ const registry: Record<string, ComponentType> = {
   threads: dynamic(() => import("./ThreadsPlayground"), { ssr: false }),
   jsi: dynamic(() => import("./JsiPlayground"), { ssr: false }),
   usestate: dynamic(() => import("./UseStatePlayground"), { ssr: false }),
+  useeffect: dynamic(() => import("./UseEffectPlayground"), { ssr: false }),
 }
 
 export function getPlayground(conceptId: string): ComponentType | null {
