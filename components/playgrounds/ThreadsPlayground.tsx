@@ -13,6 +13,49 @@ function isPrime(n: number) {
   return true
 }
 
+// Module-scope so it keeps a stable component identity across re-renders. If it
+// were defined inside ThreadsPlayground, every heartbeat tick would give it a
+// new function reference, React would remount it, and the CSS animation on the
+// native box would restart from frame 0 each time — i.e. never visibly move.
+function ThreadTrack({
+  kind,
+  jamming,
+  boxRef,
+}: {
+  kind: "native" | "js"
+  jamming: boolean
+  boxRef?: React.RefObject<HTMLDivElement | null>
+}) {
+  const isNative = kind === "native"
+  const accent = isNative ? "#059669" : "#4F46E5"
+  const frozen = jamming && !isNative
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-[12px] font-medium text-ink">{isNative ? "Native driver" : "JS driver"}</span>
+        <span
+          className="text-[10px] font-mono px-1.5 py-0.5 rounded-full"
+          style={frozen ? { color: "#DC2626", background: "rgba(220,38,38,0.1)" } : { color: accent, background: `${accent}1a` }}
+        >
+          {frozen ? "frozen" : isNative ? "Main thread" : "JS thread"}
+        </span>
+      </div>
+      <div className="relative h-11 rounded-xl bg-paper-2 border border-line overflow-hidden">
+        <div
+          ref={boxRef}
+          className={`absolute top-1.5 left-1.5 w-8 h-8 rounded-lg transition-colors ${isNative ? "thread-slide-native" : ""}`}
+          style={
+            {
+              background: frozen ? "#DC2626" : accent,
+              "--slide-distance": `${SLIDE_PX}px`,
+            } as React.CSSProperties
+          }
+        />
+      </div>
+    </div>
+  )
+}
+
 export default function ThreadsPlayground() {
   const [jamming, setJamming] = useState(false)
   const [tick, setTick] = useState(0)
@@ -26,10 +69,11 @@ export default function ThreadsPlayground() {
     return () => window.clearInterval(id)
   }, [])
 
-  // The JS-driven box: a requestAnimationFrame loop on the main thread. When the
-  // thread is jammed these callbacks stop firing, so this box freezes. (The other
-  // box is driven by a CSS transform animation on the compositor thread, which
-  // keeps gliding through a main-thread block — the browser's useNativeDriver.)
+  // The JS-driven box: a requestAnimationFrame loop running on the main thread.
+  // When the thread is jammed these callbacks stop firing, so the box freezes.
+  // (The native box is driven by a CSS transform animation on the compositor
+  // thread, which keeps gliding through a main-thread block — the browser's
+  // useNativeDriver.)
   useEffect(() => {
     let raf = 0
     const loop = () => {
@@ -45,8 +89,7 @@ export default function ThreadsPlayground() {
   const jam = useCallback(() => {
     if (jamming) return
     setJamming(true)
-    // Paint the jammed (red) state first, THEN block the thread for real —
-    // otherwise the freeze hits before the UI can show it's frozen.
+    // Paint the jammed (red) state first, THEN block the thread for real.
     window.setTimeout(() => {
       const end = performance.now() + 2000
       let n = 2
@@ -92,46 +135,9 @@ export default function ThreadsPlayground() {
     highlighted: jamming ? ["main"] : ["js", "main"],
     annotations: [
       jamming
-        ? { id: "a", text: "JS is jammed — but the Main thread keeps painting", x: 400, y: 320, color: "#DC2626" }
-        : { id: "a", text: "each box is driven by one of these threads", x: 400, y: 320, color: "#545b66" },
+        ? { id: "a", text: "JS is jammed — but the Main thread keeps painting", x: 400, y: 405, color: "#DC2626" }
+        : { id: "a", text: "each box is driven by one of these threads", x: 400, y: 405, color: "#545b66" },
     ],
-  }
-
-  const Track = ({ which }: { which: "native" | "js" }) => {
-    const isNative = which === "native"
-    const accent = isNative ? "#059669" : "#4F46E5"
-    const frozen = jamming && !isNative
-    return (
-      <div>
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-[12px] font-medium text-ink">{isNative ? "Native driver" : "JS driver"}</span>
-          <span
-            className="text-[10px] font-mono px-1.5 py-0.5 rounded-full"
-            style={
-              frozen
-                ? { color: "#DC2626", background: "rgba(220,38,38,0.1)" }
-                : { color: accent, background: `${accent}1a` }
-            }
-          >
-            {frozen ? "frozen" : isNative ? "Main thread" : "JS thread"}
-          </span>
-        </div>
-        <div className="relative h-11 rounded-xl bg-paper-2 border border-line overflow-hidden">
-          <div
-            ref={isNative ? undefined : jsBoxRef}
-            className={`absolute top-1.5 left-1.5 w-8 h-8 rounded-lg transition-colors ${
-              isNative ? "thread-slide-native" : ""
-            }`}
-            style={
-              {
-                background: frozen ? "#DC2626" : accent,
-                "--slide-distance": `${SLIDE_PX}px`,
-              } as React.CSSProperties
-            }
-          />
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -172,8 +178,8 @@ export default function ThreadsPlayground() {
                   </div>
 
                   {/* two boxes, one per thread — the side-by-side contrast */}
-                  <Track which="native" />
-                  <Track which="js" />
+                  <ThreadTrack kind="native" jamming={jamming} />
+                  <ThreadTrack kind="js" jamming={jamming} boxRef={jsBoxRef} />
                 </div>
 
                 <AnimatePresence>
