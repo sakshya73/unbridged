@@ -48,7 +48,7 @@ A concept is three pieces, two of them required:
 
 1. **Metadata** — one entry in `lib/concepts.ts` (`ConceptConfig`): `id`, `title`, `description`, `renderer`, `tags`, `analogy` ("think of it like…"), `scenario` ("you'll hit this when…"), and optionally `code` + `codeFile` for the side-by-side code panel.
 2. **Steps** — `lib/data/<id>.ts` exporting `Step[]`, then registered in `lib/data/index.ts` under the same `id`.
-3. **Playground** (optional) — a component in `components/playgrounds/` registered in `playgrounds/index.ts`. When present, the player shows a Walkthrough / Playground toggle. Only `bridge` has one so far.
+3. **Playground** (optional) — a component in `components/playgrounds/` registered in `playgrounds/index.ts`. When present, the player shows a Walkthrough / Playground toggle. `bridge` and `threads` have one so far.
 
 ## The Step model (`lib/types.ts`)
 
@@ -76,4 +76,4 @@ Each step carries:
 
 ## Concepts (current)
 
-`bridge` (flagship, has playground), `threads`, `jsi`, `lifecycle`, `usestate`, `useeffect`, `flatlist`, `hermes`, `metro`, `navigation`, `animated`.
+`bridge` (flagship, playground), `threads` (playground), `jsi`, `lifecycle`, `usestate`, `useeffect`, `flatlist`, `hermes`, `metro`, `navigation`, `animated`.
