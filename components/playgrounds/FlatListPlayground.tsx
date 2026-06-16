@@ -151,7 +151,7 @@ export default function FlatListPlayground() {
           Real browser React — only rows inside the window are mounted, positioned by computed offsets (the in-browser twin
           of getItemLayout), and the badge counts live components for real via mount/unmount effects. ScrollView is capped
           at {SCROLLVIEW_CAP.toLocaleString()} so your browser survives; a real one mounts all {N.toLocaleString()}. The blank-cell
-          fling is staged by holding the new rows one frame, to make visible what's normally a sub-frame race.
+          fling briefly blanks the visible rows (~170ms) to make a normally sub-frame race visible.
         </p>
       </div>
     </div>

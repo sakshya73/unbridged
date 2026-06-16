@@ -1,8 +1,8 @@
 import { Step, DiagramNode } from "../types"
 
 const G = "#059669" // mounted (in window)
-const BF = "#34D399" // buffer
-const U = "#94A3B8" // unmounted
+const BF = "#10B981" // buffer (darkened for white-label contrast)
+const U = "#64748B" // unmounted (darkened for white-label contrast)
 const D = "#374151" // ScrollView: all mounted
 const B = "#DC2626" // blank (not mounted yet)
 
