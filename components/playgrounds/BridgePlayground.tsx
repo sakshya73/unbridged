@@ -132,8 +132,8 @@ export default function BridgePlayground() {
     <div className="w-full flex-1 min-h-0 flex flex-col">
       <div className="flex-1 flex items-center justify-center px-6 py-4">
         <div className="w-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-14">
-          {/* diagram */}
-          <div className="relative flex-1 w-full max-w-2xl">
+          {/* diagram (hidden on phones so the phone + controls stay in view) */}
+          <div className="relative flex-1 w-full max-w-2xl hidden lg:block">
             <DiagramRenderer state={state} viewBox="0 126 800 300" />
           </div>
 

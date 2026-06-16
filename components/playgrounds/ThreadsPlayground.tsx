@@ -151,8 +151,8 @@ export default function ThreadsPlayground() {
     <div className="w-full flex-1 min-h-0 flex flex-col">
       <div className="flex-1 flex items-center justify-center px-6 py-4">
         <div className="w-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
-          {/* diagram */}
-          <div className="relative flex-1 w-full max-w-xl">
+          {/* diagram (hidden on phones so the controls stay above the fold) */}
+          <div className="relative flex-1 w-full max-w-xl hidden lg:block">
             <DiagramRenderer state={state} viewBox="20 150 760 210" />
           </div>
 

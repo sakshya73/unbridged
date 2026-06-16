@@ -19,7 +19,7 @@ export default function CodePanel({
         <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#28C840" }} />
         <span className="ml-2 text-xs font-mono text-ink-faint">{filename}</span>
       </div>
-      <pre className="py-3 text-[12.5px] font-mono leading-[1.75] overflow-x-auto">
+      <pre className="py-3 text-[11px] sm:text-[12.5px] font-mono leading-[1.7] sm:leading-[1.75] overflow-x-auto">
         {lines.map((ln, i) => {
           const n = i + 1
           const active = activeLines.includes(n)
