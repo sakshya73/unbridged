@@ -21,17 +21,17 @@ function levelOf(tags: string[]) {
   return LEVEL.intermediate
 }
 
-// The one brand mark: a solid source node wired to two ringed satellites.
-// Used white in the logo/footer and in the concept accent on the cards — one
-// drawing, so the logo and the card glyph never drift apart.
+// The brand mark: a React atom. Used white in the logo/footer and in the
+// concept accent on the cards — one drawing, so they never drift apart.
 function NodeMark({ color, size = 16 }: { color: string; size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <line x1="10" y1="10.3" x2="13.8" y2="8.2" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
-      <line x1="10" y1="13.7" x2="13.8" y2="15.8" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
-      <circle cx="7" cy="12" r="3.5" fill={color} />
-      <circle cx="17" cy="6.5" r="2.7" fill="none" stroke={color} strokeWidth="2" />
-      <circle cx="17" cy="17.5" r="2.7" fill="none" stroke={color} strokeWidth="2" />
+      <g stroke={color} strokeWidth="1.6" fill="none">
+        <ellipse cx="12" cy="12" rx="10" ry="3.8" />
+        <ellipse cx="12" cy="12" rx="10" ry="3.8" transform="rotate(60 12 12)" />
+        <ellipse cx="12" cy="12" rx="10" ry="3.8" transform="rotate(120 12 12)" />
+      </g>
+      <circle cx="12" cy="12" r="2.2" fill={color} />
     </svg>
   )
 }
