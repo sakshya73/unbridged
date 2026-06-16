@@ -225,9 +225,10 @@ export default function LearnPage({ params }: Props) {
 
         </div>
 
-        {/* caption + notes panel — normal flow, so it never overlaps the diagram */}
+        {/* caption + notes panel — fixed height + normal flow, so it never
+            overlaps the diagram and the diagram never rescales between steps */}
         {started && (
-          <div className="border-t border-line bg-paper-2 px-6 py-4">
+          <div className="border-t border-line bg-paper-2 px-6 h-[164px] flex items-center overflow-y-auto">
             <AnimatePresence mode="wait">
               <motion.div
                 key={index}
@@ -235,7 +236,7 @@ export default function LearnPage({ params }: Props) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.3 }}
-                className="max-w-3xl mx-auto flex flex-col gap-3"
+                className="w-full max-w-3xl mx-auto flex flex-col gap-2.5"
               >
                 <p className="font-display text-[17px] leading-relaxed text-ink text-center text-balance">
                   {caption}
