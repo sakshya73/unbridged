@@ -62,7 +62,8 @@ export interface Step {
   step: number
   narration: string
   caption?: string // short on-screen caption; falls back to narration
-  note?: StepNote // optional aside (definition / why / cross-link)
+  note?: StepNote // optional single aside (definition / why / cross-link)
+  notes?: StepNote[] // optional multiple asides; takes precedence over `note`
   codeLines?: number[] // 1-based lines of the concept's code snippet active this step
   diagram_state: DiagramState
 }
