@@ -171,7 +171,7 @@ export const threadsSteps: Step[] = [
     note: {
       label: "Key term",
       term: "Native driver",
-      text: "with useNativeDriver: true, the animation's per-frame work is handed to the Main thread up front, so it holds 60fps even while JS is fully blocked. It only covers transform and opacity — the things native can change without asking JS to re-measure.",
+      text: "with useNativeDriver: true, the animation's per-frame work is handed to the Main thread up front, so it holds 60fps even while JS is fully blocked. It covers non-layout props — transform, opacity, and colors — the things native can change without asking JS to re-measure. Resizing props like width or height still need JS.",
       link: { href: "/learn/animated", label: "Animated API" },
     },
     diagram_state: {
