@@ -26,12 +26,12 @@ function levelOf(tags: string[]) {
 function NodeMark({ color, size = 16 }: { color: string; size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <g stroke={color} strokeWidth="1.6" fill="none">
-        <ellipse cx="12" cy="12" rx="10" ry="3.8" />
-        <ellipse cx="12" cy="12" rx="10" ry="3.8" transform="rotate(60 12 12)" />
-        <ellipse cx="12" cy="12" rx="10" ry="3.8" transform="rotate(120 12 12)" />
+      <g stroke={color} strokeWidth="1.5" fill="none" strokeLinecap="round">
+        <ellipse cx="12" cy="12" rx="10" ry="3.85" />
+        <ellipse cx="12" cy="12" rx="10" ry="3.85" transform="rotate(60 12 12)" />
+        <ellipse cx="12" cy="12" rx="10" ry="3.85" transform="rotate(-60 12 12)" />
       </g>
-      <circle cx="12" cy="12" r="2.2" fill={color} />
+      <circle cx="12" cy="12" r="1.9" fill={color} />
     </svg>
   )
 }
