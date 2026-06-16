@@ -168,7 +168,7 @@ export default function LearnPage({ params }: Props) {
           </div>
         ) : (
         <>
-        <div className="relative flex-1 bg-dots flex items-center justify-center p-4 sm:p-10 min-h-[440px]">
+        <div className="relative flex-1 bg-dots flex items-center justify-center p-4 sm:p-10 min-h-[300px]">
           {/* step counter */}
           {started && (
             <span className="absolute top-4 right-5 text-xs font-mono text-ink-faint flex items-center gap-2.5">
@@ -223,55 +223,55 @@ export default function LearnPage({ params }: Props) {
             </div>
           )}
 
-          {/* in-canvas caption (subtitle) + optional note */}
-          {started && (
-            <div className="absolute inset-x-0 bottom-5 flex justify-center px-4 pointer-events-none">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.35 }}
-                  className="w-full max-w-2xl flex flex-col items-stretch gap-2.5"
-                >
-                  {stepNotes.map((n, ni) => (
-                    <div
-                      key={ni}
-                      className="pointer-events-auto bg-paper-2/95 backdrop-blur-sm border border-line rounded-xl px-4 py-2.5 shadow-[0_8px_28px_-14px_rgba(35,39,47,0.28)]"
-                    >
-                      <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: "var(--accent)" }}>
-                        {n.label}
-                      </span>
-                      <p className="text-[13px] text-ink-soft leading-relaxed mt-0.5">
-                        {n.term && <span className="font-semibold text-ink">{n.term}</span>}
-                        {n.term && " — "}
-                        {n.text}
-                        {n.link && (
-                          <>
-                            {" "}
-                            <Link
-                              href={n.link.href}
-                              className="font-medium whitespace-nowrap hover:underline"
-                              style={{ color: "var(--accent)" }}
-                            >
-                              {n.link.label} →
-                            </Link>
-                          </>
-                        )}
-                      </p>
-                    </div>
-                  ))}
-                  <div className="bg-paper-2/95 backdrop-blur-sm border border-line rounded-2xl px-5 py-3.5 shadow-[0_8px_28px_-12px_rgba(35,39,47,0.3)]">
-                    <p className="font-display text-[17px] leading-relaxed text-ink text-center text-balance">
-                      {caption}
-                    </p>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          )}
         </div>
+
+        {/* caption + notes panel — normal flow, so it never overlaps the diagram */}
+        {started && (
+          <div className="border-t border-line bg-paper-2 px-6 py-4">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.3 }}
+                className="max-w-3xl mx-auto flex flex-col gap-3"
+              >
+                <p className="font-display text-[17px] leading-relaxed text-ink text-center text-balance">
+                  {caption}
+                </p>
+                {stepNotes.length > 0 && (
+                  <div className="flex flex-col sm:flex-row gap-2.5">
+                    {stepNotes.map((n, ni) => (
+                      <div key={ni} className="flex-1 rounded-xl border border-line bg-paper px-3.5 py-2.5">
+                        <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: "var(--accent)" }}>
+                          {n.label}
+                        </span>
+                        <p className="text-[13px] text-ink-soft leading-relaxed mt-0.5">
+                          {n.term && <span className="font-semibold text-ink">{n.term}</span>}
+                          {n.term && " — "}
+                          {n.text}
+                          {n.link && (
+                            <>
+                              {" "}
+                              <Link
+                                href={n.link.href}
+                                className="font-medium whitespace-nowrap hover:underline"
+                                style={{ color: "var(--accent)" }}
+                              >
+                                {n.link.label} →
+                              </Link>
+                            </>
+                          )}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        )}
 
         {/* control bar */}
         <div className="border-t border-line bg-paper-2 px-6 py-3.5 flex items-center justify-between gap-4">
