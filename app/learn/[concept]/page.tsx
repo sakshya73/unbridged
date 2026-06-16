@@ -225,30 +225,35 @@ export default function LearnPage({ params }: Props) {
 
         </div>
 
-        {/* caption + notes panel — fixed height + normal flow, so it never
-            overlaps the diagram and the diagram never rescales between steps */}
+        {/* caption + notes panel — a calm strip below the diagram. min-height
+            floors it so the diagram barely shifts between steps, and it grows to
+            fit long notes instead of clipping them over the seam. */}
         {started && (
-          <div className="border-t border-line bg-paper-2 px-6 h-[164px] flex items-center overflow-y-auto">
+          <div className="border-t border-line bg-paper-2 px-6 py-7 min-h-[150px] flex flex-col justify-center">
             <AnimatePresence mode="wait">
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 8 }}
+                initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.3 }}
-                className="w-full max-w-3xl mx-auto flex flex-col gap-2.5"
+                className="w-full max-w-3xl mx-auto flex flex-col gap-5"
               >
                 <p className="font-display text-[17px] leading-relaxed text-ink text-center text-balance">
                   {caption}
                 </p>
                 {stepNotes.length > 0 && (
-                  <div className="flex flex-col sm:flex-row gap-2.5">
+                  <div className="flex flex-col sm:flex-row gap-x-9 gap-y-4">
                     {stepNotes.map((n, ni) => (
-                      <div key={ni} className="flex-1 rounded-xl border border-line bg-paper px-3.5 py-2.5">
+                      <div
+                        key={ni}
+                        className="flex-1 border-l-2 pl-4"
+                        style={{ borderColor: "color-mix(in srgb, var(--accent) 35%, transparent)" }}
+                      >
                         <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: "var(--accent)" }}>
                           {n.label}
                         </span>
-                        <p className="text-[13px] text-ink-soft leading-relaxed mt-0.5">
+                        <p className="text-[12.5px] text-ink-soft leading-relaxed mt-1">
                           {n.term && <span className="font-semibold text-ink">{n.term}</span>}
                           {n.term && " — "}
                           {n.text}
