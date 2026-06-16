@@ -28,7 +28,7 @@ npm run build
 - **Playgrounds** — hands-on sandboxes for the concepts that are easier to feel than to read.
 - **Voice** — narration via the browser's built-in speech, toggleable. Keyboard arrows step through.
 
-Concepts so far: the Bridge and the Three Threads (both with playgrounds), JSI / New Architecture, component lifecycle, useState, useEffect, FlatList, Hermes, Metro, navigation, and the Animated API.
+Concepts so far: the Bridge, the Three Threads, and JSI / New Architecture (all with playgrounds), plus component lifecycle, useState, useEffect, FlatList, Hermes, Metro, navigation, and the Animated API.
 
 ## Stack
 
