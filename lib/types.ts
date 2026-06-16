@@ -86,4 +86,5 @@ export interface ConceptConfig {
   scenario: string // "you'll hit this when…" — a concrete dev situation
   code?: string // a real code snippet the walkthrough steps through
   codeFile?: string // filename shown in the code panel header
+  published?: boolean // only completed concepts are listed on the home page
 }

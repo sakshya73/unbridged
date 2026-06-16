@@ -6,6 +6,7 @@ export const concepts: ConceptConfig[] = [
     title: "The React Native Bridge",
     description: "How JS and Native threads communicate asynchronously",
     renderer: "ThreadDiagram",
+    published: true,
     tags: ["architecture", "core", "intermediate"],
     analogy:
       "Two people who don't share a language, passing handwritten notes through a translator. It works — but every note has to be written down, carried across, and read aloud.",
@@ -27,6 +28,7 @@ export const concepts: ConceptConfig[] = [
     title: "The Three Threads",
     description: "Why React Native splits work across the JS, layout, and main threads",
     renderer: "ThreadDiagram",
+    published: true,
     tags: ["architecture", "core", "intermediate"],
     analogy:
       "A coffee shop. One person takes orders, one makes the drinks, one runs them out to tables — all at once. So when the order-taker gets stuck on a fussy order, the drinks already in progress still reach their tables; the line just can't place anything new until they're free again.",
@@ -66,6 +68,7 @@ export const concepts: ConceptConfig[] = [
     title: "New Architecture & JSI",
     description: "Direct synchronous JS-to-Native calls without the Bridge",
     renderer: "ThreadDiagram",
+    published: true,
     tags: ["architecture", "advanced", "new-arch"],
     analogy:
       "Swapping the note-passing translator for a shared whiteboard both people read and write at the same time — no more notes going back and forth.",

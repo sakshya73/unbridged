@@ -106,7 +106,7 @@ function HeroGraph() {
 }
 
 export default function Home() {
-  const interactiveCount = concepts.filter((c) => getPlayground(c.id)).length
+  const published = concepts.filter((c) => c.published)
 
   return (
     <div className="min-h-screen">
@@ -153,7 +153,7 @@ export default function Home() {
                 <span className="transition-transform group-hover:translate-x-0.5">→</span>
               </Link>
               <a href="#concepts" className="text-sm text-ink-soft hover:text-ink transition-colors">
-                or browse {concepts.length} concepts
+                or browse the concepts
               </a>
             </div>
           </motion.div>
@@ -167,13 +167,11 @@ export default function Home() {
       <main id="concepts" className="max-w-5xl mx-auto px-6 pt-4 pb-24 scroll-mt-20">
         <div className="flex items-end justify-between mb-7">
           <h2 className="font-mono text-sm text-ink-faint uppercase tracking-[0.12em]">Concepts</h2>
-          <span className="text-sm text-ink-faint">
-            {interactiveCount} interactive · {concepts.length - interactiveCount} walkthroughs
-          </span>
+          <span className="text-sm text-ink-faint">{published.length} live · more coming</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-5 auto-rows-fr">
-          {concepts.map((concept, i) => {
+          {published.map((concept, i) => {
             const accent = accentFor(concept.id)
             const level = levelOf(concept.tags)
             const stepCount = conceptSteps[concept.id]?.length ?? 0
@@ -271,9 +269,7 @@ export default function Home() {
             <a href="https://github.com/sakshya73" className="text-sm text-ink-faint hover:text-accent transition-colors">
               GitHub
             </a>
-            <span className="font-mono text-xs text-ink-faint">
-              {interactiveCount} interactive · {concepts.length} concepts
-            </span>
+            <span className="font-mono text-xs text-ink-faint">{published.length} concepts live · more on the way</span>
           </div>
         </div>
       </footer>
