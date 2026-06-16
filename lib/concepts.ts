@@ -71,6 +71,26 @@ export const concepts: ConceptConfig[] = [
       "Swapping the note-passing translator for a shared whiteboard both people read and write at the same time — no more notes going back and forth.",
     scenario:
       "Why the New Architecture can measure a view or call a native module synchronously, with no laggy round-trip.",
+    codeFile: "NewArchDemo.tsx",
+    code: `// OLD BRIDGE — async only: the value can't come back inline
+async function loadOld() {
+  const theme = await AsyncStorage.getItem('theme') // Promise, resolves later
+  applyTheme(theme)
+}
+
+// NEW ARCH (JSI) — a TurboModule call is a direct, synchronous C++ call
+import Storage from './specs/NativeStorage'         // Codegen'd, type-safe, lazy
+function loadNew() {
+  const theme = Storage.getItem('theme')            // returns the string NOW
+  applyTheme(theme)                                 // same tick, no queue
+}
+
+// because the JS<->native link is synchronous, Reanimated runs on the UI thread:
+const x = useSharedValue(0)
+const style = useAnimatedStyle(() => {
+  'worklet'                          // shipped to the UI thread, not the JS thread
+  return { transform: [{ translateX: x.value }] }   // 60fps even if JS is jammed
+})`,
   },
   {
     id: "lifecycle",
