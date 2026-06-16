@@ -21,29 +21,17 @@ function levelOf(tags: string[]) {
   return LEVEL.intermediate
 }
 
-// The one decorative idiom: a source node wired to two satellites. Used white
-// in the logo/footer, colored in the cards (Glyph), and animated in the hero.
-function Mark() {
+// The one brand mark: a solid source node wired to two ringed satellites.
+// Used white in the logo/footer and in the concept accent on the cards — one
+// drawing, so the logo and the card glyph never drift apart.
+function NodeMark({ color, size = 16 }: { color: string; size?: number }) {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <line x1="7" y1="12" x2="17" y2="7" stroke="white" strokeWidth="2" strokeLinecap="round" />
-      <line x1="7" y1="12" x2="17" y2="17" stroke="white" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="6" cy="12" r="3" fill="white" />
-      <circle cx="18" cy="6" r="2.4" fill="white" fillOpacity="0.7" />
-      <circle cx="18" cy="18" r="2.4" fill="white" fillOpacity="0.7" />
-    </svg>
-  )
-}
-
-function Glyph({ color }: { color: string }) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <path d="M7.5 12 L16.5 6.5" stroke={color} strokeWidth="1.5" strokeOpacity="0.7" strokeLinecap="round" />
-      <path d="M7.5 12 L16.5 17.5" stroke={color} strokeWidth="1.5" strokeOpacity="0.7" strokeLinecap="round" />
-      <circle cx="6" cy="12" r="3.2" fill="none" stroke={color} strokeOpacity="0.22" strokeWidth="5" />
-      <circle cx="6" cy="12" r="3.2" fill={color} />
-      <circle cx="18" cy="6" r="2.6" fill={color} fillOpacity="0.7" />
-      <circle cx="18" cy="18" r="2.6" fill={color} fillOpacity="0.7" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <line x1="10" y1="10.3" x2="13.8" y2="8.2" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
+      <line x1="10" y1="13.7" x2="13.8" y2="15.8" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="7" cy="12" r="3.5" fill={color} />
+      <circle cx="17" cy="6.5" r="2.7" fill="none" stroke={color} strokeWidth="2" />
+      <circle cx="17" cy="17.5" r="2.7" fill="none" stroke={color} strokeWidth="2" />
     </svg>
   )
 }
@@ -114,7 +102,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "var(--accent)" }}>
-              <Mark />
+              <NodeMark color="#fff" size={16} />
             </div>
             <span className="font-display text-[15px] sm:text-base font-bold tracking-tight">How React Native Works</span>
           </div>
@@ -204,7 +192,7 @@ export default function Home() {
                           className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:-rotate-3"
                           style={{ background: `${accent}1A`, boxShadow: `inset 0 0 0 1px ${accent}26` }}
                         >
-                          <Glyph color={accent} />
+                          <NodeMark color={accent} size={22} />
                         </div>
                         <div className="flex items-center gap-1.5">
                           {interactive && (
@@ -257,7 +245,7 @@ export default function Home() {
           <div>
             <div className="flex items-center gap-2.5">
               <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: "var(--accent)" }}>
-                <Mark />
+                <NodeMark color="#fff" size={14} />
               </div>
               <span className="font-display text-sm font-bold tracking-tight">How React Native Works</span>
             </div>
