@@ -8,6 +8,7 @@ const registry: Record<string, ComponentType> = {
   jsi: dynamic(() => import("./JsiPlayground"), { ssr: false }),
   usestate: dynamic(() => import("./UseStatePlayground"), { ssr: false }),
   useeffect: dynamic(() => import("./UseEffectPlayground"), { ssr: false }),
+  flatlist: dynamic(() => import("./FlatListPlayground"), { ssr: false }),
 }
 
 export function getPlayground(conceptId: string): ComponentType | null {

@@ -165,13 +165,37 @@ const MemoRow = React.memo(Row) // same props → React bails out, skips re-rend
   {
     id: "flatlist",
     title: "FlatList Virtualization",
-    description: "How the render window and scroll recycling work",
+    description: "How the render window mounts only the rows near the viewport",
     renderer: "ScrollWindow",
     tags: ["performance", "intermediate"],
     analogy:
-      "A theater that only puts out chairs for the rows people are actually sitting in, folding them away as the audience moves.",
+      "A theater that only puts out chairs for the rows people are actually sitting in, clearing them away as the audience moves.",
     scenario:
       "Why a list of 10,000 items scrolls smoothly — while the same data in a plain ScrollView would freeze the app.",
+    codeFile: "ContactList.tsx",
+    code: `const ROW_H = 64
+
+function ContactList({ contacts }) {
+  const renderItem = useCallback(
+    ({ item }) => <Row name={item.name} />,   // mounts a live row
+    [],
+  )
+  const keyExtractor = useCallback((item) => item.id, [])   // stable key, not index
+  const getItemLayout = useCallback(
+    (_, i) => ({ length: ROW_H, offset: ROW_H * i, index: i }),  // no measuring
+    [],
+  )
+  return (
+    <FlatList
+      data={contacts}            // 10,000 rows — a ScrollView would mount them all
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      getItemLayout={getItemLayout}
+      initialNumToRender={10}
+      windowSize={5}
+    />
+  )
+}`,
   },
   {
     id: "hermes",
