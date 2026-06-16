@@ -239,7 +239,26 @@ function ContactList({ contacts }) {
     analogy:
       "Handing a flip-book to someone else to flip at a steady pace, so it keeps playing smoothly even while you're busy with something else.",
     scenario:
-      "Why useNativeDriver:true keeps an animation at 60fps even when the JS thread is blocked — and why it only works on transform and opacity.",
+      "Why useNativeDriver:true keeps an animation at 60fps even when the JS thread is blocked — and why it covers transform, opacity, and color, but not layout props like width and height.",
+    codeFile: "PulseCard.tsx",
+    code: `function PulseCard() {
+  const progress = useRef(new Animated.Value(0)).current   // one node, starts at 0
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(progress, { toValue: 1, duration: 800, useNativeDriver: true }),
+        Animated.timing(progress, { toValue: 0, duration: 800, useNativeDriver: true }),
+      ]),
+    ).start()                                                // hand off to the UI thread once
+  }, [])
+
+  const opacity = progress.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] })
+  const rotate = progress.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] })
+  const scale = progress.interpolate({ inputRange: [0, 1], outputRange: [1, 1.4], extrapolate: 'clamp' })
+
+  return <Animated.View style={{ opacity, transform: [{ rotate }, { scale }] }} />
+}`,
   },
 ]
 

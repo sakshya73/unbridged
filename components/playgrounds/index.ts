@@ -9,6 +9,7 @@ const registry: Record<string, ComponentType> = {
   usestate: dynamic(() => import("./UseStatePlayground"), { ssr: false }),
   useeffect: dynamic(() => import("./UseEffectPlayground"), { ssr: false }),
   flatlist: dynamic(() => import("./FlatListPlayground"), { ssr: false }),
+  animated: dynamic(() => import("./AnimatedPlayground"), { ssr: false }),
 }
 
 export function getPlayground(conceptId: string): ComponentType | null {
