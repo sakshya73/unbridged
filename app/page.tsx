@@ -116,7 +116,7 @@ export default function Home() {
             <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "var(--accent)" }}>
               <Mark />
             </div>
-            <span className="font-display text-[17px] font-bold tracking-tight">unbridged</span>
+            <span className="font-display text-[15px] sm:text-base font-bold tracking-tight">How React Native Works</span>
           </div>
           <a
             href="https://github.com/sakshya73"
@@ -261,7 +261,7 @@ export default function Home() {
               <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: "var(--accent)" }}>
                 <Mark />
               </div>
-              <span className="font-display text-[15px] font-bold tracking-tight">unbridged</span>
+              <span className="font-display text-sm font-bold tracking-tight">How React Native Works</span>
             </div>
             <p className="mt-3 text-sm text-ink-faint max-w-xs leading-relaxed">
               Built for developers who want to understand, not just ship.

@@ -4,7 +4,9 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
-# unbridged — agent guide
+# How React Native Works — agent guide
+
+Repo/working name: `unbridged` (GitHub: sakshya73/unbridged); the product is branded **How React Native Works** and lives at howreactnativeworks.com.
 
 A web app that teaches how React Native works under the hood — the Bridge, JSI, Hermes, threads, and so on — by drawing each concept out step by step with narration and interactive playgrounds. The goal is understanding, not API lookup.
 

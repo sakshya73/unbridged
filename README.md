@@ -1,8 +1,8 @@
-# unbridged
+# How React Native Works
 
 Most of us can ship a React Native app without ever being able to explain how it actually runs. We lean on the framework, the work gets done, and then an interview asks "so how does the bridge work?" and the answer is a shrug.
 
-unbridged is the fix. Pick a concept — the Bridge, JSI, Hermes, the thread model — and watch it drawn out one step at a time, with a short caption (and optional voice) for each move. Where a concept has a real "feel" to it, there's a playground you can poke at. The Bridge one, for example, lets you flip between async and synchronous mode and watch the phone freeze, so "why is it async?" stops being a thing you memorize.
+How React Native Works is the fix. Pick a concept — the Bridge, JSI, Hermes, the thread model — and watch it drawn out one step at a time, with a short caption (and optional voice) for each move. Where a concept has a real "feel" to it, there's a playground you can poke at. The Bridge one, for example, lets you flip between async and synchronous mode and watch the phone freeze, so "why is it async?" stops being a thing you memorize.
 
 Everything is hardcoded. There's no AI call and no API key, so it runs for free and works offline.
 
