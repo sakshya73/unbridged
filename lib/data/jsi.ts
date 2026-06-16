@@ -54,11 +54,11 @@ export const jsiSteps: Step[] = [
       {
         label: "Key term",
         term: "JSI",
-        text: "the JavaScript Interface — a small C++ API the JS engine talks to directly. Instead of mailing JSON to another runtime, JS holds a real reference to a native object and calls its methods like a normal function. No serialize, no queue.",
+        text: "the JavaScript Interface — a thin C++ layer the JS engine calls directly. JS holds a real reference to a native object and calls its methods like a normal function. No JSON, no queue.",
       },
       {
         label: "Roughly",
-        text: "C++ is the one language both the JS engine and the native platforms compile down to, so it's the neutral middle ground. A 'binding' is just C++ glue that exposes a native function to JS.",
+        text: "C++ is the common language the JS engine and the native side both compile to — the neutral middle. A 'binding' is the C++ glue that exposes a native function to JS.",
       },
     ],
     diagram_state: {
@@ -77,11 +77,11 @@ export const jsiSteps: Step[] = [
       {
         label: "Key term",
         term: "HostObject",
-        text: "a native object the JS engine holds a real handle to, so calling its methods is a direct C++ call — not a copied message. The Bridge lesson said a live object can't cross, only JSON copies; JSI is exactly what changes that.",
+        text: "a native object the JS engine holds a real handle to, so calling its methods is a direct C++ call, not a copied message. The Bridge said live objects can't cross — JSI is what changes that.",
       },
       {
         label: "Wait — synchronous?",
-        text: "the Bridge lesson warned that waiting synchronously on a slow cross-runtime hop freezes the app. JSI calls are synchronous too — but they're a direct in-process C++ call, microseconds rather than a queued round-trip, so waiting is effectively free.",
+        text: "the Bridge warned that synchronous waiting freezes the app. JSI calls are synchronous too, but a direct in-process call — microseconds, not a queued round-trip — so the wait is effectively free.",
       },
     ],
     diagram_state: {
@@ -105,7 +105,7 @@ export const jsiSteps: Step[] = [
       {
         label: "Key term",
         term: "Codegen",
-        text: "at build time it reads your TypeScript spec files and generates the typed C++/Java/Obj-C glue that TurboModules and Fabric are checked against. That's where 'type-safe' comes from — and one reason the New Architecture needs a native rebuild.",
+        text: "at build time it reads your TypeScript specs and generates the typed native glue TurboModules and Fabric are checked against. That's where 'type-safe' comes from — and why it needs a native rebuild.",
       },
     ],
     diagram_state: {
