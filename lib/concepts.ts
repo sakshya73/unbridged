@@ -116,6 +116,26 @@ const style = useAnimatedStyle(() => {
       "A whiteboard you erase and redraw: change one number and React redraws that board — and the ones below it — to match.",
     scenario:
       "Why your whole screen re-renders when a single counter changes, and how to stop the parts that don't need to.",
+    codeFile: "Counter.tsx",
+    code: `function Counter() {
+  // React OWNS this slot. \`count\` is just this render's snapshot of it.
+  const [count, setCount] = useState(0)
+
+  function handlePress() {
+    // Enqueues an update + schedules a re-render. count is NOT changed now.
+    setCount(count + 1)
+  }
+
+  return (
+    <View>
+      <Text>Count: {count}</Text>
+      <Pressable onPress={handlePress}><Text>+1</Text></Pressable>
+      <Row label="A" />
+      <MemoRow label="B" />
+    </View>
+  )
+}
+const MemoRow = React.memo(Row) // same props → React bails out, skips re-render`,
   },
   {
     id: "useeffect",
