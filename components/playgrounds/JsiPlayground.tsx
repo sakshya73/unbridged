@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
 const DELAY_MS = 220 // simulated async round-trip for the "old bridge" lane
-const DISC = 46
+const DISC = 48
 const RING = 18
 
 export default function JsiPlayground() {
@@ -17,6 +17,7 @@ export default function JsiPlayground() {
   const discRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
   const lagRef = useRef<HTMLSpanElement>(null)
+  const dotRef = useRef<HTMLSpanElement>(null)
   const targetRef = useRef<{ x: number; y: number } | null>(null)
   const bufRef = useRef<{ x: number; y: number; t: number }[]>([])
 
@@ -24,7 +25,6 @@ export default function JsiPlayground() {
     if (el) el.style.transform = `translate(${x - size / 2}px, ${y - size / 2}px)`
   }
 
-  // start centered
   useEffect(() => {
     const pad = padRef.current
     if (!pad) return
@@ -36,8 +36,6 @@ export default function JsiPlayground() {
     place(ringRef.current, c.x, c.y, RING)
   }, [])
 
-  // follow loop: ring is always exactly on the pointer; the disc follows it,
-  // locked in JSI mode or trailing by DELAY_MS in bridge mode.
   useEffect(() => {
     let raf = 0
     const loop = () => {
@@ -59,9 +57,13 @@ export default function JsiPlayground() {
           dy = pos.y
         }
         place(discRef.current, dx, dy, DISC)
+        const dist = Math.round(Math.hypot(t.x - dx, t.y - dy))
+        const locked = dist <= 6
         if (lagRef.current) {
-          lagRef.current.textContent = `${Math.round(Math.hypot(t.x - dx, t.y - dy))} px`
+          lagRef.current.textContent = locked ? "locked to your finger" : `${dist} px behind`
+          lagRef.current.style.color = locked ? "#059669" : "#D97706"
         }
+        if (dotRef.current) dotRef.current.style.background = locked ? "#059669" : "#D97706"
       }
       raf = requestAnimationFrame(loop)
     }
@@ -77,27 +79,33 @@ export default function JsiPlayground() {
     bufRef.current.push({ x: e.clientX - r.left, y: e.clientY - r.top, t: performance.now() })
   }, [])
 
-  const discColor = mode === "jsi" ? "#8B5CF6" : "#D97706"
+  const accent = mode === "jsi" ? "#8B5CF6" : "#D97706"
 
   return (
     <div className="w-full flex-1 min-h-0 flex flex-col">
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-4 gap-4">
-        <p className="text-[13px] text-ink-faint text-center">
-          Move your cursor across the pad. The <b className="text-ink">view</b> (filled) chases your{" "}
-          <b className="text-ink">finger</b> (ring).
+      <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6 py-8">
+        <p className="text-sm text-ink-soft text-center">
+          Move your cursor across the pad. The <b className="text-ink">view</b> chases your{" "}
+          <b className="text-ink">finger</b> — watch how closely it keeps up.
         </p>
 
         <div
           ref={padRef}
           onPointerMove={onMove}
-          className="relative w-full max-w-2xl h-[320px] rounded-2xl border border-line bg-paper-2 overflow-hidden cursor-none shadow-[0_10px_30px_-18px_rgba(35,39,47,0.3)]"
-          style={{ touchAction: "none" }}
+          className="relative w-full max-w-2xl h-[360px] rounded-[28px] border border-line overflow-hidden cursor-none shadow-[0_24px_60px_-24px_rgba(35,39,47,0.35)]"
+          style={{ background: "radial-gradient(120% 120% at 50% 0%, #ffffff 0%, #f3f4f8 100%)" }}
         >
           {/* the view (follows, lagging or locked) */}
           <div
             ref={discRef}
-            className="absolute top-0 left-0 rounded-2xl shadow-lg flex items-center justify-center text-white text-[11px] font-semibold pointer-events-none"
-            style={{ width: DISC, height: DISC, background: discColor, willChange: "transform" }}
+            className="absolute top-0 left-0 rounded-2xl flex items-center justify-center text-white text-[11px] font-semibold pointer-events-none transition-colors"
+            style={{
+              width: DISC,
+              height: DISC,
+              background: `linear-gradient(150deg, ${accent}, ${accent}cc)`,
+              boxShadow: `0 10px 24px -6px ${accent}80`,
+              willChange: "transform",
+            }}
           >
             view
           </div>
@@ -107,51 +115,49 @@ export default function JsiPlayground() {
             className="absolute top-0 left-0 rounded-full border-2 pointer-events-none"
             style={{ width: RING, height: RING, borderColor: "var(--ink)", willChange: "transform" }}
           />
-        </div>
 
-        <div className="text-[13px] text-ink-soft">
-          view is <span ref={lagRef} className="font-mono font-semibold text-ink">0 px</span> behind your finger
+          {/* live lag HUD */}
+          <div className="absolute top-4 left-4 inline-flex items-center gap-2 rounded-full border border-line bg-white/80 backdrop-blur px-3 py-1.5 shadow-sm">
+            <span ref={dotRef} className="w-2 h-2 rounded-full" style={{ background: "#059669" }} />
+            <span className="text-[12px] text-ink-soft">
+              view is <span ref={lagRef} className="font-mono font-semibold" style={{ color: "#059669" }}>locked to your finger</span>
+            </span>
+          </div>
         </div>
       </div>
 
       {/* controls */}
-      <div className="border-t border-line bg-paper-2 px-5 py-4">
-        <div className="flex items-center justify-center gap-2 mb-3">
-          <span className="text-xs text-ink-faint mr-1">Architecture</span>
-          <div className="flex bg-ink/[0.05] rounded-lg p-0.5 text-sm">
-            <button
-              onClick={() => setMode("jsi")}
-              className={`px-3 py-1 rounded-md transition-all ${mode === "jsi" ? "bg-paper-2 text-ink font-medium shadow-sm" : "text-ink-soft hover:text-ink"}`}
-            >
-              🟣 JSI (New Arch)
-            </button>
-            <button
-              onClick={() => setMode("bridge")}
-              className={`px-3 py-1 rounded-md transition-all ${mode === "bridge" ? "bg-paper-2 text-ink font-medium shadow-sm" : "text-ink-soft hover:text-ink"}`}
-            >
-              🟠 Old Bridge (async)
-            </button>
+      <div className="border-t border-line bg-paper-2 px-6 py-7">
+        <div className="max-w-2xl mx-auto flex flex-col items-center gap-5">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs text-ink-faint">Architecture</span>
+            <div className="flex bg-ink/[0.05] rounded-xl p-1 text-sm">
+              <button
+                onClick={() => setMode("jsi")}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all ${mode === "jsi" ? "bg-paper-2 text-ink font-medium shadow-sm" : "text-ink-soft hover:text-ink"}`}
+              >
+                <span className="w-2 h-2 rounded-full" style={{ background: "#8B5CF6" }} /> JSI (New Arch)
+              </button>
+              <button
+                onClick={() => setMode("bridge")}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all ${mode === "bridge" ? "bg-paper-2 text-ink font-medium shadow-sm" : "text-ink-soft hover:text-ink"}`}
+              >
+                <span className="w-2 h-2 rounded-full" style={{ background: "#D97706" }} /> Old Bridge
+              </button>
+            </div>
           </div>
+
+          <p className="text-center text-[15px] text-ink leading-relaxed max-w-xl text-balance">
+            {mode === "jsi"
+              ? "The gesture runs synchronously on the UI thread, so the view stays glued to your finger. Flip to Old Bridge to feel the lag JSI removes."
+              : "Every move round-trips the async bridge, so the view trails your finger and catches up only when you stop."}
+          </p>
+
+          <p className="text-center text-[11px] text-ink-faint max-w-md leading-relaxed">
+            Staged analogy — the bridge lag is a simulated ~220ms delay; the JSI lane updates instantly, as a real
+            synchronous call would.
+          </p>
         </div>
-
-        <p className="text-center text-sm text-ink-soft max-w-2xl mx-auto leading-relaxed">
-          {mode === "jsi" ? (
-            <>
-              <b className="text-ink">JSI:</b> the gesture runs synchronously on the UI thread (a Reanimated worklet), so
-              the view stays locked to your finger. Now flip to Old Bridge to feel the difference.
-            </>
-          ) : (
-            <>
-              <b className="text-ink">Old Bridge:</b> every move round-trips the async bridge, so the view trails your
-              finger and only catches up when you stop. This is the lag JSI removes.
-            </>
-          )}
-        </p>
-
-        <p className="mt-3 text-center text-[12px] text-ink-faint max-w-2xl mx-auto leading-relaxed">
-          Staged analogy: the lag is a simulated ~220ms delay standing in for the async round-trip (serialize → queue →
-          cross → deserialize). The JSI lane updates immediately, like a real synchronous call on the UI thread.
-        </p>
       </div>
     </div>
   )
