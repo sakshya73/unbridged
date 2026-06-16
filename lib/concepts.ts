@@ -29,9 +29,9 @@ export const concepts: ConceptConfig[] = [
     renderer: "ThreadDiagram",
     tags: ["architecture", "core", "intermediate"],
     analogy:
-      "A kitchen line: one cook reads the tickets, another plates each dish, a third runs the food out and works the room. Because the jobs are split, the dining room keeps moving even when the ticket-reader is slammed.",
+      "A coffee shop. One person takes orders, one makes the drinks, one runs them out to tables — all at once. So when the order-taker gets stuck on a fussy order, the drinks already in progress still reach their tables; the line just can't place anything new until they're free again.",
     scenario:
-      "Why a list keeps scrolling smoothly even while a heavy calculation runs in your JavaScript: different threads handle different jobs.",
+      "Your screen keeps scrolling smoothly, but the second some heavy JavaScript runs, taps stop landing and new rows flash up blank — until it finishes.",
     codeFile: "ThreadDemo.tsx",
     code: `function ThreadDemo() {
   const [primes, setPrimes] = useState(0)
