@@ -32,6 +32,34 @@ export const concepts: ConceptConfig[] = [
       "A kitchen line: one cook reads the tickets, another plates each dish, a third runs the food out and works the room. Because the jobs are split, the dining room keeps moving even when the ticket-reader is slammed.",
     scenario:
       "Why a list keeps scrolling smoothly even while a heavy calculation runs in your JavaScript: different threads handle different jobs.",
+    codeFile: "ThreadDemo.tsx",
+    code: `function ThreadDemo() {
+  const [primes, setPrimes] = useState(0)
+  const scrollY = useRef(new Animated.Value(0)).current
+
+  // Heavy synchronous work — runs on the JS thread.
+  // Until this loop ends, nothing else in JS can run.
+  function findPrimes() {
+    let n = 2, hits = 0
+    const end = Date.now() + 3000
+    while (Date.now() < end) if (isPrime(n++)) hits++
+    setPrimes(hits)
+  }
+
+  return (
+    <View>
+      <Animated.FlatList
+        data={rows}
+        renderItem={({ item }) => <Row label={item} />}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+      />
+      <Button title={\`Primes found: \${primes}\`} onPress={findPrimes} />
+    </View>
+  )
+}`,
   },
   {
     id: "jsi",
