@@ -56,20 +56,3 @@ body {
 ::selection {
   background: color-mix(in srgb, var(--accent) 22%, transparent);
 }
-
-/* Compositor-driven slide for the Threads playground. A CSS transform animation
-   runs on the browser's compositor thread, so it keeps gliding even while a
-   synchronous JS loop jams the main thread — the in-browser analog of
-   useNativeDriver. (A JS rAF-driven slide, by contrast, freezes with the main
-   thread.) */
-@keyframes thread-slide {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(var(--slide-distance, 150px));
-  }
-}
-.thread-slide-native {
-  animation: thread-slide 1.5s ease-in-out infinite alternate;
-}

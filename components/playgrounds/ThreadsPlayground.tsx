@@ -13,10 +13,9 @@ function isPrime(n: number) {
   return true
 }
 
-// Module-scope so it keeps a stable component identity across re-renders. If it
-// were defined inside ThreadsPlayground, every heartbeat tick would give it a
-// new function reference, React would remount it, and the CSS animation on the
-// native box would restart from frame 0 each time — i.e. never visibly move.
+// Module-scope so it keeps a stable component identity across re-renders (every
+// heartbeat tick re-renders the parent). Just renders a box with the given ref;
+// the parent drives the motion.
 function ThreadTrack({
   kind,
   jamming,
@@ -24,7 +23,7 @@ function ThreadTrack({
 }: {
   kind: "native" | "js"
   jamming: boolean
-  boxRef?: React.RefObject<HTMLDivElement | null>
+  boxRef: React.RefObject<HTMLDivElement | null>
 }) {
   const isNative = kind === "native"
   const accent = isNative ? "#059669" : "#4F46E5"
@@ -43,13 +42,8 @@ function ThreadTrack({
       <div className="relative h-11 rounded-xl bg-paper-2 border border-line overflow-hidden">
         <div
           ref={boxRef}
-          className={`absolute top-1.5 left-1.5 w-8 h-8 rounded-lg transition-colors ${isNative ? "thread-slide-native" : ""}`}
-          style={
-            {
-              background: frozen ? "#DC2626" : accent,
-              "--slide-distance": `${SLIDE_PX}px`,
-            } as React.CSSProperties
-          }
+          className="absolute top-1.5 left-1.5 w-8 h-8 rounded-lg transition-colors"
+          style={{ background: frozen ? "#DC2626" : accent }}
         />
       </div>
     </div>
@@ -60,6 +54,7 @@ export default function ThreadsPlayground() {
   const [jamming, setJamming] = useState(false)
   const [tick, setTick] = useState(0)
   const jsBoxRef = useRef<HTMLDivElement>(null)
+  const nativeBoxRef = useRef<HTMLDivElement>(null)
   const primesRef = useRef(0)
 
   // JS heartbeat — a plain setInterval. It can only fire while the JS thread is
@@ -69,11 +64,23 @@ export default function ThreadsPlayground() {
     return () => window.clearInterval(id)
   }, [])
 
-  // The JS-driven box: a requestAnimationFrame loop running on the main thread.
-  // When the thread is jammed these callbacks stop firing, so the box freezes.
-  // (The native box is driven by a CSS transform animation on the compositor
-  // thread, which keeps gliding through a main-thread block — the browser's
-  // useNativeDriver.)
+  // Native-driven box: a Web Animations API transform animation. The browser
+  // runs composited transform animations on the compositor thread, so it keeps
+  // gliding even while a synchronous JS loop blocks the main thread — the
+  // in-browser analog of useNativeDriver. (Using element.animate rather than a
+  // CSS class so it can't be stripped by the CSS build.)
+  useEffect(() => {
+    const el = nativeBoxRef.current
+    if (!el?.animate) return
+    const anim = el.animate(
+      [{ transform: "translateX(0px)" }, { transform: `translateX(${SLIDE_PX}px)` }],
+      { duration: 1500, iterations: Infinity, direction: "alternate", easing: "ease-in-out" }
+    )
+    return () => anim.cancel()
+  }, [])
+
+  // JS-driven box: a requestAnimationFrame loop on the main thread. When the
+  // thread is jammed these callbacks stop firing, so this box freezes.
   useEffect(() => {
     let raf = 0
     const loop = () => {
@@ -178,7 +185,7 @@ export default function ThreadsPlayground() {
                   </div>
 
                   {/* two boxes, one per thread — the side-by-side contrast */}
-                  <ThreadTrack kind="native" jamming={jamming} />
+                  <ThreadTrack kind="native" jamming={jamming} boxRef={nativeBoxRef} />
                   <ThreadTrack kind="js" jamming={jamming} boxRef={jsBoxRef} />
                 </div>
 
