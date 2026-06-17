@@ -136,7 +136,7 @@ export default function Home() {
       <main id="concepts" className="max-w-5xl mx-auto px-6 pb-24 scroll-mt-20">
         <div className="flex items-end justify-between mb-5 border-t-2 pt-4" style={{ borderColor: INK }}>
           <h2 className="font-mono text-[12px] tracking-[0.2em] uppercase font-bold">Index of sheets</h2>
-          <span className="font-mono text-[11px] tracking-[0.18em] uppercase" style={{ color: "rgba(27,36,51,0.5)" }}>{String(published.length).padStart(2, "0")} live · {concepts.length} total</span>
+          <span className="font-mono text-[11px] tracking-[0.18em] uppercase" style={{ color: "rgba(27,36,51,0.5)" }}>{String(published.length).padStart(2, "0")} live{drafts.length > 0 ? ` · ${published.length + drafts.length} total` : ""}</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {published.map((c, i) => <SheetCard key={c.id} concept={c} n={i + 1} />)}
