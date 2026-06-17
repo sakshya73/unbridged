@@ -33,6 +33,46 @@ export function warmVoices() {
   window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices()
 }
 
+// Split narration into sentence-sized chunks. A single long utterance gets
+// silently truncated by Chrome at ~15s, so we speak one sentence at a time and
+// only report "done" after the last one — which keeps onEnd honest.
+function chunkText(text: string): string[] {
+  const sentences = text.match(/[^.!?]+[.!?]*(\s|$)/g) ?? [text]
+  const out: string[] = []
+  for (const raw of sentences) {
+    const s = raw.trim()
+    if (!s) continue
+    if (s.length <= 200) {
+      out.push(s)
+      continue
+    }
+    // a very long sentence: break it on commas so no chunk risks the cutoff
+    let buf = ""
+    for (const part of s.split(/,\s*/)) {
+      if (buf && (buf + ", " + part).length > 200) {
+        out.push(buf)
+        buf = part
+      } else {
+        buf = buf ? `${buf}, ${part}` : part
+      }
+    }
+    if (buf) out.push(buf)
+  }
+  return out.length ? out : [text]
+}
+
+// Monotonic id so a new speak()/stopSpeaking() invalidates any in-flight
+// sequence: stale utterance callbacks check `mine === runId` and bail.
+let runId = 0
+let keepAlive: ReturnType<typeof setInterval> | undefined
+
+function clearKeepAlive() {
+  if (keepAlive) {
+    clearInterval(keepAlive)
+    keepAlive = undefined
+  }
+}
+
 export function speak(text: string, onEnd?: () => void) {
   if (!voiceSupported()) {
     onEnd?.()
@@ -40,17 +80,40 @@ export function speak(text: string, onEnd?: () => void) {
   }
   const synth = window.speechSynthesis
   synth.cancel()
-  const u = new SpeechSynthesisUtterance(text)
+  clearKeepAlive()
+  const mine = ++runId
   const v = pickVoice()
-  if (v) u.voice = v
-  u.lang = v?.lang ?? "en-US"
-  u.rate = 0.98
-  u.pitch = 1.02
-  u.onend = () => onEnd?.()
-  u.onerror = () => onEnd?.()
-  synth.speak(u)
+  const chunks = chunkText(text)
+  let i = 0
+
+  // Chrome can quietly pause long synthesis; nudging resume keeps it alive.
+  keepAlive = setInterval(() => {
+    if (mine !== runId || !synth.speaking) return
+    synth.resume()
+  }, 7000)
+
+  const speakNext = () => {
+    if (mine !== runId) return
+    if (i >= chunks.length) {
+      clearKeepAlive()
+      onEnd?.()
+      return
+    }
+    const u = new SpeechSynthesisUtterance(chunks[i++])
+    if (v) u.voice = v
+    u.lang = v?.lang ?? "en-US"
+    u.rate = 0.98
+    u.pitch = 1.02
+    u.onend = () => speakNext()
+    u.onerror = () => speakNext() // skip a failed chunk, keep going
+    synth.speak(u)
+  }
+  speakNext()
 }
 
 export function stopSpeaking() {
-  if (voiceSupported()) window.speechSynthesis.cancel()
+  if (!voiceSupported()) return
+  runId++ // invalidate any in-flight sequence so its callbacks no-op
+  clearKeepAlive()
+  window.speechSynthesis.cancel()
 }

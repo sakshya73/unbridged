@@ -23,6 +23,12 @@ function dwellFor(text: string) {
   return Math.min(7000, Math.max(2800, 1500 + text.length * 34))
 }
 
+// Rough upper bound on how long the narration takes to speak, used only as a
+// safety fallback so a slow step never stalls — the real signal is speech onEnd.
+function estimateSpeechMs(text: string) {
+  return Math.max(3000, (text.length / 12) * 1000)
+}
+
 export default function LearnPage({ params }: Props) {
   const { concept: conceptId } = use(params)
   const router = useRouter()
@@ -37,6 +43,8 @@ export default function LearnPage({ params }: Props) {
   const [voice, setVoice] = useState(true)
   const [mode, setMode] = useState<"walk" | "play">("walk")
   const speakSeq = useRef(0)
+  const prevIndexRef = useRef(0)
+  const prevPlayingRef = useRef(false)
 
   const current = steps[index]
   const diagramState: DiagramState | null = current?.diagram_state ?? null
@@ -50,42 +58,65 @@ export default function LearnPage({ params }: Props) {
   // stop any speech when leaving the page
   useEffect(() => () => stopSpeaking(), [])
 
-  // Advance loop: voice-driven when enabled (advance when narration finishes),
-  // otherwise a reading-paced timer.
+  // Narrate + advance. Speech is tied to the STEP, not just auto-play: landing
+  // on a step speaks it (so the arrow keys narrate too). Auto-advance only
+  // happens while playing, and waits for the narration to actually finish.
   useEffect(() => {
-    if (!isPlaying) return
+    if (mode === "play" || !started) {
+      prevIndexRef.current = index
+      prevPlayingRef.current = isPlaying
+      return
+    }
+
+    const indexChanged = prevIndexRef.current !== index
+    const justPaused = prevPlayingRef.current && !isPlaying
+    prevIndexRef.current = index
+    prevPlayingRef.current = isPlaying
+
+    // A bare pause (no step change): stop talking, don't re-narrate the step.
+    if (justPaused && !indexChanged) {
+      stopSpeaking()
+      return
+    }
+
     const last = index >= steps.length - 1
     let done = false
     const advance = () => {
       if (done) return
       done = true
-      setIndex((i) => (i < steps.length - 1 ? i + 1 : i))
       if (last) setIsPlaying(false)
+      else setIndex((i) => Math.min(i + 1, steps.length - 1))
     }
 
     if (voice && voiceSupported()) {
       const seq = ++speakSeq.current
       const startedAt = Date.now()
-      const MIN_MS = 1600 // never blow past a step faster than this
-      const MAX_MS = 13000 // …but never stall if onend never fires
+      const MIN_MS = 1200
+      let maxFallback: number | undefined
       speak(speakText, () => {
         if (seq !== speakSeq.current) return
+        if (maxFallback) window.clearTimeout(maxFallback)
+        if (!isPlaying) return // arrived via the arrows: narrate once, don't advance
         const wait = Math.max(0, MIN_MS - (Date.now() - startedAt))
         window.setTimeout(() => {
           if (seq === speakSeq.current) advance()
         }, wait)
       })
-      const maxFallback = window.setTimeout(advance, MAX_MS)
+      // safety net only while playing, sized to the narration so it never cuts it off
+      if (isPlaying) maxFallback = window.setTimeout(advance, estimateSpeechMs(speakText) + 8000)
       return () => {
         speakSeq.current++
-        window.clearTimeout(maxFallback)
+        if (maxFallback) window.clearTimeout(maxFallback)
         stopSpeaking()
       }
     }
 
-    const t = window.setTimeout(advance, dwellFor(caption))
-    return () => window.clearTimeout(t)
-  }, [isPlaying, index, voice, caption, speakText, steps.length])
+    // voice off: a reading-paced timer drives auto-play; manual nav just sits
+    if (isPlaying) {
+      const t = window.setTimeout(advance, dwellFor(caption))
+      return () => window.clearTimeout(t)
+    }
+  }, [isPlaying, index, voice, caption, speakText, steps.length, mode, started])
 
   const play = useCallback(() => {
     if (!started) setStarted(true)
