@@ -14,6 +14,8 @@ const registry: Record<string, ComponentType> = {
   metro: dynamic(() => import("./MetroPlayground"), { ssr: false }),
   hermes: dynamic(() => import("./HermesPlayground"), { ssr: false }),
   navigation: dynamic(() => import("./NavigationPlayground"), { ssr: false }),
+  "render-pipeline": dynamic(() => import("./RenderPipelinePlayground"), { ssr: false }),
+  startup: dynamic(() => import("./StartupPlayground"), { ssr: false }),
 }
 
 export function getPlayground(conceptId: string): ComponentType | null {

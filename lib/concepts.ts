@@ -337,6 +337,70 @@ function HomeScreen({ navigation }) {
   return <Animated.View style={{ opacity, transform: [{ rotate }, { scale }] }} />
 }`,
   },
+  {
+    id: "render-pipeline",
+    title: "The Render Pipeline",
+    description: "Fabric's three phases — render, commit, mount — from React's commit to native views",
+    renderer: "FlowDiagram",
+    tags: ["architecture", "advanced", "new-arch"],
+    analogy:
+      "A print shop. One station typesets a fresh copy of only the pages you changed, another measures every page and locks the final layout, and a third runs out front and swaps just those pages into the binder on the shelf.",
+    scenario:
+      "Why layout doesn't freeze when your JS thread is busy, why you never see half-updated frames, and what \"Fabric clones the shadow tree\" actually means in an interview.",
+    codeFile: "fabric-pipeline.txt",
+    code: `// Fabric's render pipeline, in pseudo host-config ops.
+// React commits an element tree → Fabric runs RENDER → COMMIT → MOUNT.
+
+// ── RENDER ── build an IMMUTABLE C++ shadow tree (one node per host component)
+const root  = createNode("View",  rootProps)
+const text  = createNode("Text",  { value: "Hi" })
+const image = createNode("Image", { source: avatar })
+appendChild(root, text)
+appendChild(root, image)
+
+// On an update the tree is never mutated — it is CLONED.
+// Clone only the changed node + the path to the root; SHARE the rest.
+const image2 = cloneNodeWithNewProps(image, { source: newAvatar })
+const root2  = cloneNode(root)          // text is shared, not cloned
+appendChild(root2, image2)
+
+// ── COMMIT ── run Yoga layout, then promote the new tree
+layout(root2)            // Yoga computes x/y/width/height — off the JS thread
+commit(root2)            // promote root2 as the "next tree" to mount
+
+// ── MOUNT ── diff prev vs next, apply minimal mutations on the MAIN thread
+const mutations = diff(previousTree, root2)   // → [updateView(image, …)]
+mount(mutations)         // createView / updateView / removeView / deleteView`,
+  },
+  {
+    id: "startup",
+    title: "App Startup & TTI",
+    description: "Icon tap to first interactive frame: the cold-start sequence across threads",
+    renderer: "Timeline",
+    tags: ["architecture", "performance", "intermediate"],
+    analogy:
+      "Opening a restaurant for the day: unlock the doors and turn on the lights, fire up the kitchen, prep every station, plate the first order — and only then can a guest actually be served.",
+    scenario:
+      "Why your app shows a blank or splash screen for a beat after the icon tap — and which levers (Hermes, inline requires, a smaller bundle) actually move that time.",
+    codeFile: "boot.js",
+    code: `// index.js — the app entry. The COMMENTED boot order below is what
+// happens on a cold start, from icon tap to the first interactive frame.
+import { AppRegistry } from 'react-native'
+import App from './App'
+
+// 1. NATIVE LAUNCH   — OS creates the process, runs native startup (main thread)
+// 2. RUNTIME INIT    — RN runtime + JS engine (Hermes) spin up
+// 3. BUNDLE LOAD+EVAL— Hermes mmaps the .hbc bytecode, evaluates module factories
+//                      (this file's top-level code runs HERE)
+
+AppRegistry.registerComponent('App', () => App) // name the root component
+
+// 4. The native host then calls runApplication('App') into a Surface, which:
+// 5. FIRST RENDER    — React renders your tree (reconcile, on the JS thread)
+// 6. COMMIT + LAYOUT — commit the tree, Yoga lays it out (shadow thread)
+//    + MOUNT         — mount the first host views (main thread)
+// 7. FIRST FRAME     — the first interactive frame paints  →  TTI`,
+  },
 ]
 
 export const getConcept = (id: string) => concepts.find((c) => c.id === id)

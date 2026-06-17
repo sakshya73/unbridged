@@ -12,6 +12,8 @@ export const ACCENT: Record<string, string> = {
   metro: "#F59E0B",
   navigation: "#0D9488",
   animated: "#DB2777",
+  "render-pipeline": "#6D28D9",
+  startup: "#0369A1",
 }
 
 export const accentFor = (id: string) => ACCENT[id] ?? "#149eca"

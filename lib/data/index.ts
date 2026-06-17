@@ -10,6 +10,8 @@ import { hermesSteps } from "./hermes"
 import { metroSteps } from "./metro"
 import { navigationSteps } from "./navigation"
 import { animatedSteps } from "./animated"
+import { renderPipelineSteps } from "./render-pipeline"
+import { startupSteps } from "./startup"
 
 export const conceptSteps: Record<string, Step[]> = {
   bridge: bridgeSteps,
@@ -23,4 +25,6 @@ export const conceptSteps: Record<string, Step[]> = {
   metro: metroSteps,
   navigation: navigationSteps,
   animated: animatedSteps,
+  "render-pipeline": renderPipelineSteps,
+  startup: startupSteps,
 }

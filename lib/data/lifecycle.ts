@@ -67,7 +67,7 @@ export const lifecycleSteps: Step[] = [
     narration: "What does React commit into? Native views. On the New Architecture that's Fabric's C++ shadow tree; on the old architecture it's the UIManager's view tree. Either way the part above — render and commit — is React's reconciler doing the same work. The architecture only changes what sits underneath.",
     notes: [
       { label: "Heads up", text: "don't tie this lifecycle to Fabric. Render, commit, and effects are React's phases and run the same on the old architecture (Paper / UIManager) and the New one (Fabric). Fabric changes what the commit targets underneath, not the React phases themselves." },
-      { label: "Next", text: "how that commit reaches native — direct, synchronous calls over JSI — is its own story.", link: { href: "/learn/jsi", label: "New Architecture & JSI" } },
+      { label: "Next", text: "what Fabric actually does when React commits — build the shadow tree, lay it out, mount it — is the render pipeline.", link: { href: "/learn/render-pipeline", label: "The Render Pipeline" } },
     ],
     diagram_state: { nodes: [render(), commit(), host()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "native views", SETTLE)], highlighted: ["host"], annotations: an("host = Fabric C++ tree (new arch) or UIManager (old arch) — same React phases", SLATE) },
   },

@@ -8,13 +8,13 @@ The full list of concepts we're covering, step by step. A topic only goes **live
 - 📝 **Draft** — full step data already written, not yet brought to bar / published
 - ⬜ **Planned** — not started
 
-**6 tracks · 75 topics · 3 done · 8 draft · 64 planned.** Every planned topic reuses an existing renderer type (ThreadDiagram, ComponentTree, Timeline, ScrollWindow, FlowDiagram, NavigationStack) or a small extension — no new rendering engine needed.
+**6 tracks · 75 topics · 3 done · 11 draft · 61 planned.** Every planned topic reuses an existing renderer type (ThreadDiagram, ComponentTree, Timeline, ScrollWindow, FlowDiagram, NavigationStack) or a small extension — no new rendering engine needed.
 
 ## Up next (build order)
 
-1. ⬜ **The render pipeline: render → commit → mount** — straight off the finished bridge/threads/JSI arc; high interview weight, a great scrub-through-three-phases visual, the spine of the Rendering track.
+1. 📝 **The render pipeline: render → commit → mount** — at bar: 11 steps + a scrub-through-three-phases playground (unpublished, in review).
 2. ⬜ **Yoga layout engine in depth** — sits beside the pipeline (layout happens in commit); turns "flexbox just works" into an algorithm with an editable flex-tree playground.
-3. ⬜ **App startup & bootstrap sequence** — high weight; a clean swimlane-timeline that stitches threads + bundle load + first render into one story.
+3. 📝 **App startup & bootstrap sequence** — at bar: a 12-step swimlane timeline + a lever playground (Hermes / inline requires / bundle size). Unpublished, in review.
 4. 📝 **useState & re-renders** — fastest win: steps already written, mostly polish + publish + a small playground. Opens both Rendering and Hooks.
 5. 📝 **useEffect: commit, cleanup, deps** — already drafted; the after-paint timeline with cleanup-before-next-effect is a top interview topic. Pairs with useState.
 6. 📝 **FlatList virtualization internals** — drafted; the render-window band with a flat mounted-cell counter is one of the most satisfying visuals. Anchors Performance.
@@ -30,9 +30,9 @@ The finished track lives here, and it's the spine the other tracks refer back to
 - [x] ✅ **The React Native Bridge** · intermediate · high — how JS and native communicate over a serialized, batched queue, and why that boundary causes jank.
 - [x] ✅ **The Three Threads** · intermediate · high — why work splits across JS, shadow/layout, and main/UI threads, and how blocking one starves the others.
 - [x] ✅ **New Architecture & JSI** · advanced · high — direct synchronous JS↔native calls: HostObjects, TurboModules, Fabric, Codegen, why Reanimated worklets become possible.
-- [ ] ⬜ **App startup & bootstrap sequence** · intermediate · high — icon tap → first frame: native launch, instance init, engine spin-up, bundle load+eval, first render, mount, where TTI goes.
+- [ ] 📝 **App startup & bootstrap sequence** · intermediate · high — icon tap → first frame: native launch, instance init, engine spin-up, bundle load+eval, first render, mount, where TTI goes. _(at bar as the `startup` page — swimlane timeline + lever playground; covers the Track 4 TTI-optimization row too. Unpublished, in review.)_
 - [ ] ⬜ **How RN embeds in a native app (the host)** · intermediate · medium — RN as a hosted library: RootView/Surface, a native tree containing a JS-driven subtree, lifecycle ownership, brownfield.
-- [ ] ⬜ **The render pipeline: render → commit → mount** · advanced · high — Fabric's three phases: build the immutable C++ shadow tree, lay out + diff atomically, apply mutations on the main thread.
+- [ ] 📝 **The render pipeline: render → commit → mount** · advanced · high — Fabric's three phases: build the immutable C++ shadow tree, lay out + diff atomically, apply mutations on the main thread. _(at bar, unpublished — in review.)_
 - [ ] ⬜ **Reconciliation & the React commit-to-host boundary** · advanced · medium — how Fiber diffs the element tree and what the RN host config does at each commit (createInstance/appendChild/commitUpdate).
 - [ ] ⬜ **Yoga layout engine in depth** · advanced · high — how Flexbox resolves on a shadow-node tree: the layout pass, grow/shrink/basis, measure functions, dirty-marking, that it runs synchronously in commit.
 - [ ] ⬜ **Native Modules vs TurboModules** · advanced · high — the module layer: legacy async JSON-batched modules vs lazy, Codegen-typed, synchronous JSI HostObject TurboModules.
@@ -89,7 +89,7 @@ The most common "hard problem you solved" area, and it pays off the architecture
 - [ ] 📝 **FlatList virtualization internals** · intermediate · high — mounts only rows in a moving window and unmounts the rest; windowSize/initialNumToRender/getItemLayout tune it. _(draft written.)_
 - [ ] ⬜ **List pitfalls: keys, getItemLayout, blank cells** · intermediate · high — index keys force remounts; missing getItemLayout makes it measure every row (blank cells on fast scroll); non-memoized renderItem re-renders all.
 - [ ] 📝 **Native driver vs JS driver (Animated)** · intermediate · high — useNativeDriver:true serializes values once and runs on the UI thread (60fps when JS is busy); only transform/opacity qualify. _(draft written.)_
-- [ ] ⬜ **Startup time & TTI optimization** · advanced · high — TTI = native init + bundle load/parse + first render; shrink with Hermes bytecode, inline requires, RAM bundles, deferring work.
+- [ ] 📝 **Startup time & TTI optimization** · advanced · high — TTI = native init + bundle load/parse + first render; shrink with Hermes bytecode, inline requires, deferring work. _(covered by the `startup` page's lever section — unpublished, in review.)_
 - [ ] ⬜ **Bridge serialization & batched updates as a perf cost** · advanced · medium — old-arch cross-thread calls are JSON-serialized and batched; chatty patterns flood it; JSI removes serialization.
 - [ ] ⬜ **InteractionManager & scheduling work** · intermediate · medium — defer non-urgent work until after animations settle (runAfterInteractions); rAF vs setTimeout vs concurrent scheduling.
 - [ ] ⬜ **Image & asset performance** · intermediate · medium — decoding full-res for a thumbnail blows up memory; resize at source, cache decoded bitmaps, use FastImage/expo-image.
