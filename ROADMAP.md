@@ -100,7 +100,7 @@ The most common "hard problem you solved" area, and it pays off the architecture
 
 Turns the off-thread payoff of JSI into something you can feel: navigation is "just state + reducers," and Reanimated/RNGH answer "how do I stay at 60fps when JS is busy."
 
-- [ ] 📝 **React Navigation: the navigation state tree** · intermediate · high — navigation state is a serializable JSON tree; navigators are components; an action produces a new state via a router reducer. _(draft written.)_
+- [ ] 📝 **React Navigation: the navigation state tree** · intermediate · high — navigation state is a serializable JSON tree; navigators are components; an action produces a new state via a router reducer. _(at bar: 11 steps, notes, code panel, push/pop playground — unpublished, in review.)_
 - [ ] ⬜ **Stack navigator internals & native-stack vs JS stack** · intermediate · high — how a stack keeps mounted-screen history, why screens stay mounted underneath, JS stack vs native-stack transitions/memory.
 - [ ] ⬜ **Screen lifecycle: focus/blur vs mount, and useFocusEffect** · intermediate · high — a screen can be mounted but unfocused; why fetches belong in useFocusEffect/useIsFocused, not useEffect.
 - [ ] ⬜ **Tabs, drawers & screen optimization (lazy / unmountOnBlur / freeze)** · intermediate · high — navigators mount all routes by default; lazy/detach/react-freeze stop background screens re-rendering.

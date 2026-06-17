@@ -287,6 +287,25 @@ __r(1);                                // boot: run the entry module
       "A stack of cards: each new screen lands on top; going back lifts the top card off to reveal the one beneath.",
     scenario:
       "Why a screen stays mounted underneath when you push a new one — and why that back gesture feels truly native.",
+    codeFile: "AppNavigator.tsx",
+    code: `import { createNativeStackNavigator } from '@react-navigation/native-stack'
+
+const Stack = createNativeStackNavigator()   // a navigator IS a component
+
+function AppNavigator() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Details" component={DetailsScreen} />
+    </Stack.Navigator>
+  )
+}
+
+function HomeScreen({ navigation }) {
+  // You don't mutate state — you dispatch an ACTION; a router reducer
+  // returns the next { index, routes } tree.
+  return <Button title="Go" onPress={() => navigation.navigate('Details')} />
+}`,
   },
   {
     id: "animated",

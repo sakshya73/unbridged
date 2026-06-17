@@ -13,6 +13,7 @@ const registry: Record<string, ComponentType> = {
   lifecycle: dynamic(() => import("./LifecyclePlayground"), { ssr: false }),
   metro: dynamic(() => import("./MetroPlayground"), { ssr: false }),
   hermes: dynamic(() => import("./HermesPlayground"), { ssr: false }),
+  navigation: dynamic(() => import("./NavigationPlayground"), { ssr: false }),
 }
 
 export function getPlayground(conceptId: string): ComponentType | null {
