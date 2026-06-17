@@ -42,7 +42,7 @@ const TYPE: Record<string, string> = { root: "View", text: "Text", image: "Image
 const PHASES = ["RENDER", "COMMIT", "MOUNT"]
 const PHASE_COLOR = ["#4F46E5", "#7C3AED", "#0891B2"]
 
-export default function RenderPipelinePlayground() {
+export default function RenderPipelinePlayground({ accent = "#0e7490" }: { accent?: string }) {
   const [baseline, setBaseline] = useState<Props | null>(null)
   const [pending, setPending] = useState<Props>({ textValue: TEXTS[0], imageVer: 1 })
   const [phase, setPhase] = useState(0) // 0 idle, 1 rendered, 2 committed, 3 mounted
@@ -146,13 +146,13 @@ export default function RenderPipelinePlayground() {
         </div>
       </div>
 
-      <div className="border-t border-line bg-paper-2 px-5 py-4">
+      <div className="border-t-2 bg-white px-5 py-4" style={{ borderColor: "#1b2433" }}>
         <div className="flex flex-wrap items-center justify-center gap-2.5 mb-3">
-          <button onClick={step} disabled={phase === 3} className="px-4 py-2 rounded-xl text-white text-sm font-semibold active:scale-95 transition-transform disabled:opacity-40" style={{ background: "var(--accent)" }}>
+          <button onClick={step} disabled={phase === 3} className="px-4 py-2 rounded-md text-white text-sm font-semibold active:scale-95 transition-transform disabled:opacity-40" style={{ background: accent, boxShadow: "3px 3px 0 0 #1b2433" }}>
             {phase === 0 ? "▶ Render" : phase === 1 ? "▶ Commit" : phase === 2 ? "▶ Mount" : "✓ mounted"}
           </button>
-          <button onClick={editText} className="px-3 py-2 rounded-xl text-[13px] font-medium border border-line bg-paper-2 hover:border-line-strong transition-colors">edit Text</button>
-          <button onClick={editImage} className="px-3 py-2 rounded-xl text-[13px] font-medium border border-line bg-paper-2 hover:border-line-strong transition-colors">edit Image</button>
+          <button onClick={editText} className="px-3 py-2 rounded-xl text-[13px] font-medium border border-[rgba(27,36,51,0.2)] bg-paper-2 hover:border-line-strong transition-colors">edit Text</button>
+          <button onClick={editImage} className="px-3 py-2 rounded-xl text-[13px] font-medium border border-[rgba(27,36,51,0.2)] bg-paper-2 hover:border-line-strong transition-colors">edit Image</button>
           <button onClick={reset} className="px-3 py-2 rounded-xl text-[13px] text-ink-soft hover:text-ink hover:bg-ink/5 transition-colors">↺ reset</button>
         </div>
 

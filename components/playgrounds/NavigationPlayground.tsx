@@ -27,7 +27,7 @@ const PUSH_ORDER = ["Details", "Profile", "Settings"]
 const TABS = ["Feed", "Search", "Profile"]
 const COLOR: Record<string, string> = { Home: "#0D9488", Details: "#3B82F6", Profile: "#8B5CF6", Settings: "#D97706", Feed: "#0D9488", Search: "#3B82F6" }
 
-export default function NavigationPlayground() {
+export default function NavigationPlayground({ accent = "#0e7490" }: { accent?: string }) {
   const keyRef = useRef(1)
   const nextKey = () => `r${keyRef.current++}`
   const [mode, setMode] = useState<"stack" | "tabs">("stack")
@@ -127,7 +127,7 @@ export default function NavigationPlayground() {
         </div>
       </div>
 
-      <div className="border-t border-line bg-paper-2 px-5 py-4">
+      <div className="border-t-2 bg-white px-5 py-4" style={{ borderColor: "#1b2433" }}>
         <div className="flex flex-wrap items-center justify-center gap-2.5 mb-3">
           <div className="flex bg-ink/[0.05] rounded-lg p-0.5 text-sm">
             <button onClick={() => setMode("stack")} className={`px-3 py-1 rounded-md transition-all ${mode === "stack" ? "bg-paper-2 text-ink font-medium shadow-sm" : "text-ink-soft hover:text-ink"}`}>Stack</button>
@@ -135,10 +135,10 @@ export default function NavigationPlayground() {
           </div>
           {mode === "stack" ? (
             <>
-              <button onClick={push} disabled={!canPush} className="px-4 py-2 rounded-xl text-white text-sm font-semibold active:scale-95 transition-transform disabled:opacity-40" style={{ background: "var(--accent)" }}>
+              <button onClick={push} disabled={!canPush} className="px-4 py-2 rounded-md text-white text-sm font-semibold active:scale-95 transition-transform disabled:opacity-40" style={{ background: accent, boxShadow: "3px 3px 0 0 #1b2433" }}>
                 Push screen
               </button>
-              <button onClick={pop} disabled={!canPop} className="px-3.5 py-2 rounded-xl text-[13px] font-medium border border-line bg-paper-2 hover:border-line-strong transition-colors disabled:opacity-40">
+              <button onClick={pop} disabled={!canPop} className="px-3.5 py-2 rounded-xl text-[13px] font-medium border border-[rgba(27,36,51,0.2)] bg-paper-2 hover:border-line-strong transition-colors disabled:opacity-40">
                 ← Go back
               </button>
             </>

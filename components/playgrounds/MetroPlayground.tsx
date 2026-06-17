@@ -46,7 +46,7 @@ const KIND_COLOR: Record<Kind, string> = {
 
 type Phase = "idle" | "resolved" | "transformed" | "serialized"
 
-export default function MetroPlayground() {
+export default function MetroPlayground({ accent = "#0e7490" }: { accent?: string }) {
   const [phase, setPhase] = useState<Phase>("idle")
   const [ids, setIds] = useState<Record<string, number>>({})
   const [cached, setCached] = useState<Set<string>>(new Set())
@@ -182,15 +182,15 @@ export default function MetroPlayground() {
         </div>
       </div>
 
-      <div className="border-t border-line bg-paper-2 px-5 py-4">
+      <div className="border-t-2 bg-white px-5 py-4" style={{ borderColor: "#1b2433" }}>
         <div className="flex flex-wrap items-center justify-center gap-2.5 mb-3">
-          <button onClick={runResolve} className="px-3.5 py-1.5 rounded-lg text-[13px] font-medium border border-line bg-paper-2 hover:border-line-strong transition-colors">
+          <button onClick={runResolve} className="px-3.5 py-1.5 rounded-md text-[13px] font-medium text-white transition-colors" style={{ background: accent, boxShadow: "3px 3px 0 0 #1b2433" }}>
             ▶ Resolve
           </button>
-          <button onClick={runTransform} disabled={phase === "idle"} className="px-3.5 py-1.5 rounded-lg text-[13px] font-medium border border-line bg-paper-2 hover:border-line-strong transition-colors disabled:opacity-40">
+          <button onClick={runTransform} disabled={phase === "idle"} className="px-3.5 py-1.5 rounded-lg text-[13px] font-medium border border-[rgba(27,36,51,0.2)] bg-paper-2 hover:border-line-strong transition-colors disabled:opacity-40">
             ▶ Transform
           </button>
-          <button onClick={runSerialize} disabled={phase === "idle"} className="px-3.5 py-1.5 rounded-lg text-[13px] font-medium border border-line bg-paper-2 hover:border-line-strong transition-colors disabled:opacity-40">
+          <button onClick={runSerialize} disabled={phase === "idle"} className="px-3.5 py-1.5 rounded-lg text-[13px] font-medium border border-[rgba(27,36,51,0.2)] bg-paper-2 hover:border-line-strong transition-colors disabled:opacity-40">
             ▶ Serialize
           </button>
           <button onClick={reset} className="px-3 py-1.5 rounded-lg text-[13px] text-ink-soft hover:text-ink hover:bg-ink/5 transition-colors">

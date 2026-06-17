@@ -22,7 +22,7 @@ const bridgeNode: DiagramNode = {
 
 type Dir = "out" | "in"
 
-export default function BridgePlayground() {
+export default function BridgePlayground({ accent = "#0e7490" }: { accent?: string }) {
   const [sync, setSync] = useState(false) // false = async (how RN really works)
   const [blocking, setBlocking] = useState(false) // sync mode: JS frozen mid-call
   const [flights, setFlights] = useState<Packet[]>([])
@@ -150,7 +150,7 @@ export default function BridgePlayground() {
                     onClick={() => fire("in")}
                     disabled={frozen}
                     className="w-full py-3 rounded-xl text-white font-semibold text-sm mb-3 active:scale-95 transition-transform disabled:opacity-60"
-                    style={{ background: "var(--accent)" }}
+                    style={{ background: accent }}
                   >
                     ❤ Like
                   </button>
@@ -194,7 +194,7 @@ export default function BridgePlayground() {
       </div>
 
       {/* controls */}
-      <div className="border-t border-line bg-paper-2 px-5 py-4">
+      <div className="border-t-2 bg-white px-5 py-4" style={{ borderColor: "#1b2433" }}>
         <div className="flex items-center justify-center gap-2 mb-3">
           <span className="text-xs text-ink-faint mr-1">Bridge mode</span>
           <div className="flex bg-ink/[0.05] rounded-lg p-0.5 text-sm">
@@ -217,7 +217,8 @@ export default function BridgePlayground() {
           <button
             onClick={() => fire("out")}
             disabled={frozen}
-            className="px-4 py-2 rounded-xl text-sm font-medium border border-line bg-white hover:border-line-strong hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0"
+            className="px-4 py-2 rounded-md text-sm font-medium text-white hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0"
+            style={{ background: accent, boxShadow: "3px 3px 0 0 #1b2433" }}
           >
             📤 JS renders a <span className="font-mono text-[13px]">&lt;Text&gt;</span>
           </button>

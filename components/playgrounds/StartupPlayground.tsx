@@ -20,7 +20,7 @@ const SIZES: Record<Size, { label: string; evalMs: number; parseMs: number }> = 
 }
 const C = { main: "#0F766E", engine: "#8B5CF6", parse: "#DC2626", eval: "#F59E0B", render: "#059669", layout: "#7C3AED", mount: "#0891B2" }
 
-export default function StartupPlayground() {
+export default function StartupPlayground({ accent = "#0e7490" }: { accent?: string }) {
   const [size, setSize] = useState<Size>("medium")
   const [hermes, setHermes] = useState(true)
   const [inlineReq, setInlineReq] = useState(true)
@@ -110,21 +110,21 @@ export default function StartupPlayground() {
         </div>
       </div>
 
-      <div className="border-t border-line bg-paper-2 px-5 py-4">
+      <div className="border-t-2 bg-white px-5 py-4" style={{ borderColor: "#1b2433" }}>
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2.5 mb-3">
-          <button onClick={play} className="px-4 py-1.5 rounded-lg text-white text-[13px] font-semibold active:scale-95 transition-transform" style={{ background: "var(--accent)" }}>
+          <button onClick={play} className="px-4 py-1.5 rounded-md text-white text-[13px] font-semibold active:scale-95 transition-transform" style={{ background: accent, boxShadow: "3px 3px 0 0 #1b2433" }}>
             {playing ? "❚❚ pause" : t >= total ? "↻ replay" : "▶ play"}
           </button>
-          <button onClick={() => { setHermes((h) => !h); reset() }} className={`px-3 py-1.5 rounded-lg text-[13px] font-medium border transition-colors ${hermes ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-line text-ink-soft hover:text-ink"}`}>
+          <button onClick={() => { setHermes((h) => !h); reset() }} className={`px-3 py-1.5 rounded-lg text-[13px] font-medium border transition-colors ${hermes ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-[rgba(27,36,51,0.2)] text-ink-soft hover:text-ink"}`}>
             Hermes {hermes ? "on" : "off"}
           </button>
-          <button onClick={() => { setInlineReq((v) => !v); reset() }} className={`px-3 py-1.5 rounded-lg text-[13px] font-medium border transition-colors ${inlineReq ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-line text-ink-soft hover:text-ink"}`}>
+          <button onClick={() => { setInlineReq((v) => !v); reset() }} className={`px-3 py-1.5 rounded-lg text-[13px] font-medium border transition-colors ${inlineReq ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-[rgba(27,36,51,0.2)] text-ink-soft hover:text-ink"}`}>
             inline requires {inlineReq ? "on" : "off"}
           </button>
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-ink-faint mr-1">bundle</span>
             {(["small", "medium", "large"] as Size[]).map((s) => (
-              <button key={s} onClick={() => { setSize(s); reset() }} className={`px-2.5 h-7 rounded-lg text-[12px] font-mono border transition-colors ${size === s ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-line text-ink-soft hover:text-ink"}`}>{SIZES[s].label}</button>
+              <button key={s} onClick={() => { setSize(s); reset() }} className={`px-2.5 h-7 rounded-lg text-[12px] font-mono border transition-colors ${size === s ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-[rgba(27,36,51,0.2)] text-ink-soft hover:text-ink"}`}>{SIZES[s].label}</button>
             ))}
           </div>
           <button onClick={reset} className="px-3 py-1.5 rounded-lg text-[13px] text-ink-soft hover:text-ink hover:bg-ink/5 transition-colors">↺ reset</button>

@@ -33,7 +33,7 @@ function Row({ label, color }: { label: string; color: string }) {
 const MemoRow = memo(Row)
 
 // The real React tree being observed.
-function Demo({ memoOn, updater }: { memoOn: boolean; updater: boolean }) {
+function Demo({ memoOn, updater, accent }: { memoOn: boolean; updater: boolean; accent: string }) {
   const [count, setCount] = useState(0)
   const pr = useRef(0)
   pr.current += 1
@@ -77,8 +77,8 @@ function Demo({ memoOn, updater }: { memoOn: boolean; updater: boolean }) {
       <div className="flex gap-2.5 pt-1">
         <button
           onClick={bump}
-          className="flex-1 py-2.5 rounded-xl text-white text-sm font-semibold active:scale-95 transition-transform shadow-[0_4px_14px_-6px_rgba(20,158,202,0.6)]"
-          style={{ background: "var(--accent)" }}
+          className="flex-1 py-2.5 rounded-md text-white text-sm font-semibold active:scale-95 transition-transform"
+          style={{ background: accent, boxShadow: "3px 3px 0 0 #1b2433" }}
         >
           +1
         </button>
@@ -93,7 +93,7 @@ function Demo({ memoOn, updater }: { memoOn: boolean; updater: boolean }) {
   )
 }
 
-export default function UseStatePlayground() {
+export default function UseStatePlayground({ accent = "#0e7490" }: { accent?: string }) {
   const [memoOn, setMemoOn] = useState(true)
   const [updater, setUpdater] = useState(false)
   const [resetKey, setResetKey] = useState(0)
@@ -103,7 +103,7 @@ export default function UseStatePlayground() {
     <button
       onClick={onClick}
       className={`px-3 py-1.5 rounded-lg text-[13px] font-medium border transition-colors ${
-        on ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-line text-ink-soft hover:text-ink"
+        on ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-[rgba(27,36,51,0.2)] text-ink-soft hover:text-ink"
       }`}
     >
       {children}
@@ -113,10 +113,10 @@ export default function UseStatePlayground() {
   return (
     <div className="w-full flex-1 min-h-0 flex flex-col">
       <div className="flex-1 flex items-center justify-center px-6 py-6">
-        <Demo key={demoKey} memoOn={memoOn} updater={updater} />
+        <Demo key={demoKey} memoOn={memoOn} updater={updater} accent={accent} />
       </div>
 
-      <div className="border-t border-line bg-paper-2 px-5 py-5">
+      <div className="border-t-2 bg-white px-5 py-5" style={{ borderColor: "#1b2433" }}>
         <div className="flex flex-wrap items-center justify-center gap-2.5 mb-3">
           <span className="text-xs text-ink-faint mr-1">Row B</span>
           <Toggle on={memoOn} onClick={() => setMemoOn((v) => !v)}>{memoOn ? "React.memo ON" : "React.memo OFF"}</Toggle>

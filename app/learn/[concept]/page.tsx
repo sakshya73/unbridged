@@ -206,7 +206,7 @@ export default function LearnPage({ params }: Props) {
       <main className="flex-1 flex flex-col">
         {mode === "play" && Playground ? (
           <div className="flex-1 flex flex-col" style={GRIDBG}>
-            <Playground />
+            <Playground accent={accent} />
           </div>
         ) : (
         <>

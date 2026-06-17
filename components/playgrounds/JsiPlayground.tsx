@@ -6,7 +6,7 @@ const DELAY_MS = 220 // simulated async round-trip for the "old bridge" lane
 const DISC = 48
 const RING = 18
 
-export default function JsiPlayground() {
+export default function JsiPlayground({ accent = "#0e7490" }: { accent?: string }) {
   const [mode, setMode] = useState<"bridge" | "jsi">("jsi")
   const modeRef = useRef<"bridge" | "jsi">("jsi")
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function JsiPlayground() {
     bufRef.current.push({ x: e.clientX - r.left, y: e.clientY - r.top, t: performance.now() })
   }, [])
 
-  const accent = mode === "jsi" ? "#8B5CF6" : "#D97706"
+  const stageAccent = mode === "jsi" ? "#8B5CF6" : "#D97706"
 
   return (
     <div className="w-full flex-1 min-h-0 flex flex-col">
@@ -102,8 +102,8 @@ export default function JsiPlayground() {
             style={{
               width: DISC,
               height: DISC,
-              background: `linear-gradient(150deg, ${accent}, ${accent}cc)`,
-              boxShadow: `0 10px 24px -6px ${accent}80`,
+              background: `linear-gradient(150deg, ${stageAccent}, ${stageAccent}cc)`,
+              boxShadow: `0 10px 24px -6px ${stageAccent}80`,
               willChange: "transform",
             }}
           >
@@ -127,7 +127,7 @@ export default function JsiPlayground() {
       </div>
 
       {/* controls */}
-      <div className="border-t border-line bg-paper-2 px-6 py-7">
+      <div className="border-t-2 bg-white px-6 py-7" style={{ borderColor: "#1b2433" }}>
         <div className="max-w-2xl mx-auto flex flex-col items-center gap-5">
           <div className="flex items-center gap-2.5">
             <span className="text-xs text-ink-faint">Architecture</span>

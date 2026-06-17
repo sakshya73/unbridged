@@ -16,7 +16,7 @@ const SIZES: Record<Size, { label: string; jscRead: number; parse: number; compi
 
 const GREY = "#94A3B8", RED = "#DC2626", DRED = "#B91C1C", GREEN = "#059669", AMBER = "#F59E0B", BLUE = "#3B82F6"
 
-export default function HermesPlayground() {
+export default function HermesPlayground({ accent = "#0e7490" }: { accent?: string }) {
   const [size, setSize] = useState<Size>("medium")
   const [cpu, setCpu] = useState(false)
   const [playing, setPlaying] = useState(false)
@@ -139,9 +139,9 @@ export default function HermesPlayground() {
         )}
       </div>
 
-      <div className="border-t border-line bg-paper-2 px-5 py-4">
+      <div className="border-t-2 bg-white px-5 py-4" style={{ borderColor: "#1b2433" }}>
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2.5 mb-3">
-          <button onClick={play} className="px-4 py-1.5 rounded-lg text-white text-[13px] font-semibold active:scale-95 transition-transform" style={{ background: "var(--accent)" }}>
+          <button onClick={play} className="px-4 py-1.5 rounded-md text-white text-[13px] font-semibold active:scale-95 transition-transform" style={{ background: accent, boxShadow: "3px 3px 0 0 #1b2433" }}>
             {playing ? "❚❚ pause" : t >= maxMs ? "↻ replay" : "▶ play"}
           </button>
           <div className="flex items-center gap-1.5">
@@ -150,7 +150,7 @@ export default function HermesPlayground() {
               <button
                 key={s}
                 onClick={() => { setSize(s); reset() }}
-                className={`px-2.5 h-7 rounded-lg text-[12px] font-mono border transition-colors ${size === s ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-line text-ink-soft hover:text-ink"}`}
+                className={`px-2.5 h-7 rounded-lg text-[12px] font-mono border transition-colors ${size === s ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-[rgba(27,36,51,0.2)] text-ink-soft hover:text-ink"}`}
               >
                 {SIZES[s].label}
               </button>
@@ -158,7 +158,7 @@ export default function HermesPlayground() {
           </div>
           <button
             onClick={() => { setCpu((c) => !c); reset() }}
-            className={`px-3 py-1.5 rounded-lg text-[13px] font-medium border transition-colors ${cpu ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-line text-ink-soft hover:text-ink"}`}
+            className={`px-3 py-1.5 rounded-lg text-[13px] font-medium border transition-colors ${cpu ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-[rgba(27,36,51,0.2)] text-ink-soft hover:text-ink"}`}
           >
             heavy CPU loop {cpu ? "on" : "off"}
           </button>

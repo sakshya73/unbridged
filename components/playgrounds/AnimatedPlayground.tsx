@@ -26,7 +26,7 @@ const pctOf = (v: number) => ((v - MIN) / SPAN) * 100
 
 type Key = "opacity" | "rotate" | "translateX" | "scale" | "color"
 
-export default function AnimatedPlayground() {
+export default function AnimatedPlayground({ accent = "#0e7490" }: { accent?: string }) {
   const [driver, setDriver] = useState(0.45)
   const [extend, setExtend] = useState(false)
   const [playing, setPlaying] = useState(false)
@@ -129,7 +129,7 @@ export default function AnimatedPlayground() {
         <div className="w-[260px] rounded-2xl border border-line bg-paper-2 p-3.5">
           <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-line">
             <span className="text-[12px] font-semibold text-ink">driver value</span>
-            <span className="font-mono text-base font-bold" style={{ color: "var(--accent)" }}>{driver.toFixed(2)}</span>
+            <span className="font-mono text-base font-bold" style={{ color: accent }}>{driver.toFixed(2)}</span>
           </div>
           <div className="flex flex-col gap-2">
             {rows.map((r) => (
@@ -145,7 +145,7 @@ export default function AnimatedPlayground() {
         </div>
       </div>
 
-      <div className="border-t border-line bg-paper-2 px-5 py-4">
+      <div className="border-t-2 bg-white px-5 py-4" style={{ borderColor: "#1b2433" }}>
         {/* the single driver slider, with the out-of-range zones drawn in */}
         <div className="max-w-xl mx-auto">
           <div className="flex items-center justify-between mb-1.5">
@@ -168,11 +168,11 @@ export default function AnimatedPlayground() {
             {/* fill from 0 to the thumb */}
             <div
               className="absolute top-1/2 -translate-y-1/2 h-2 rounded-full"
-              style={{ left: `${pctOf(0)}%`, width: `${Math.max(0, pctOf(driver) - pctOf(0))}%`, background: "var(--accent)" }}
+              style={{ left: `${pctOf(0)}%`, width: `${Math.max(0, pctOf(driver) - pctOf(0))}%`, background: accent }}
             />
             <div
               className="absolute top-1/2 h-5 w-5 -translate-y-1/2 -translate-x-1/2 rounded-full border-2 border-paper shadow-md"
-              style={{ left: `${pctOf(driver)}%`, background: "var(--accent)" }}
+              style={{ left: `${pctOf(driver)}%`, background: accent }}
             />
           </div>
           <div className="flex justify-between text-[10px] text-ink-faint font-mono mt-1 px-0.5">
@@ -188,7 +188,8 @@ export default function AnimatedPlayground() {
 
           <button
             onClick={() => setPlaying((p) => !p)}
-            className="px-3.5 py-1.5 rounded-lg text-[13px] font-medium border border-line bg-paper-2 hover:border-line-strong transition-colors"
+            className="px-3.5 py-1.5 rounded-md text-[13px] font-medium text-white transition-colors"
+            style={{ background: accent, boxShadow: "3px 3px 0 0 #1b2433" }}
           >
             {playing ? "❚❚ pause" : "▶ play loop"}
           </button>
@@ -196,7 +197,7 @@ export default function AnimatedPlayground() {
           {/* driver eligibility — JS driver is active; native can't do color or a live slider */}
           <div className="flex items-center gap-1.5">
             <span className="px-2.5 py-1 rounded-md text-[12px] font-medium text-white" style={{ background: "#2563EB" }}>JS driver</span>
-            <span className="px-2.5 py-1 rounded-md text-[12px] border border-line text-ink-faint cursor-not-allowed" title="unavailable here: the slider value is driven from React state every frame, which needs JS">Native driver</span>
+            <span className="px-2.5 py-1 rounded-md text-[12px] border border-[rgba(27,36,51,0.2)] text-ink-faint cursor-not-allowed" title="unavailable here: the slider value is driven from React state every frame, which needs JS">Native driver</span>
           </div>
 
           <button onClick={reset} className="px-3 py-1.5 rounded-lg text-[13px] text-ink-soft hover:text-ink hover:bg-ink/5 transition-colors">↺ reset</button>
@@ -208,7 +209,7 @@ export default function AnimatedPlayground() {
             <button
               key={r.k}
               onClick={() => setMuted((m) => ({ ...m, [r.k]: !m[r.k] }))}
-              className={`px-2 py-0.5 rounded-md text-[11px] font-mono border transition-colors ${muted[r.k] ? "border-line text-ink-faint line-through" : "border-line-strong bg-paper text-ink"}`}
+              className={`px-2 py-0.5 rounded-md text-[11px] font-mono border transition-colors ${muted[r.k] ? "border-[rgba(27,36,51,0.2)] text-ink-faint line-through" : "border-line-strong bg-paper text-ink"}`}
             >
               {r.label}
             </button>

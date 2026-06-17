@@ -50,7 +50,7 @@ function ThreadTrack({
   )
 }
 
-export default function ThreadsPlayground() {
+export default function ThreadsPlayground({ accent = "#0e7490" }: { accent?: string }) {
   const [jamming, setJamming] = useState(false)
   const [tick, setTick] = useState(0)
   const jsBoxRef = useRef<HTMLDivElement>(null)
@@ -208,7 +208,7 @@ export default function ThreadsPlayground() {
       </div>
 
       {/* controls */}
-      <div className="border-t border-line bg-paper-2 px-5 py-4">
+      <div className="border-t-2 bg-white px-5 py-4" style={{ borderColor: "#1b2433" }}>
         <p className="text-center text-[13px] text-ink-faint mb-3">
           Both boxes are gliding. Now freeze the JS thread and watch which one keeps moving.
         </p>
@@ -216,8 +216,8 @@ export default function ThreadsPlayground() {
           <button
             onClick={jam}
             disabled={jamming}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white active:scale-95 transition-transform disabled:opacity-70"
-            style={{ background: jamming ? "#DC2626" : "var(--accent)" }}
+            className="px-5 py-2.5 rounded-md text-sm font-semibold text-white active:scale-95 transition-transform disabled:opacity-70"
+            style={{ background: jamming ? "#DC2626" : accent, boxShadow: "3px 3px 0 0 #1b2433" }}
           >
             {jamming ? "JS thread frozen…" : "🔥 Jam the JS thread (2s)"}
           </button>

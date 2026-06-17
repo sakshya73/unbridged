@@ -66,7 +66,7 @@ const DEPS: { id: DepsMode; label: string }[] = [
   { id: "obj", label: "[{…}]" },
 ]
 
-export default function UseEffectPlayground() {
+export default function UseEffectPlayground({ accent = "#0e7490" }: { accent?: string }) {
   const [room, setRoom] = useState("general")
   const [depsMode, setDepsMode] = useState<DepsMode>("dep")
   const [tick, setTick] = useState(0)
@@ -130,7 +130,7 @@ export default function UseEffectPlayground() {
         </div>
       </div>
 
-      <div className="border-t border-line bg-paper-2 px-5 py-4">
+      <div className="border-t-2 bg-white px-5 py-4" style={{ borderColor: "#1b2433" }}>
         <div className="flex flex-col items-center gap-2.5">
           <div className="flex items-center gap-2">
             <span className="text-xs text-ink-faint mr-1">Room</span>
@@ -138,7 +138,7 @@ export default function UseEffectPlayground() {
               <button
                 key={rm}
                 onClick={() => setRoom(rm)}
-                className={`px-2.5 py-1 rounded-lg text-[12px] font-medium border transition-colors ${room === rm ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-line text-ink-soft hover:text-ink"}`}
+                className={`px-2.5 py-1 rounded-lg text-[12px] font-medium border transition-colors ${room === rm ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-[rgba(27,36,51,0.2)] text-ink-soft hover:text-ink"}`}
               >
                 {rm}
               </button>
@@ -151,7 +151,7 @@ export default function UseEffectPlayground() {
               <button
                 key={d.id}
                 onClick={() => switchMode(d.id)}
-                className={`px-2.5 py-1 rounded-lg text-[12px] font-mono border transition-colors ${depsMode === d.id ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-line text-ink-soft hover:text-ink"}`}
+                className={`px-2.5 py-1 rounded-lg text-[12px] font-mono border transition-colors ${depsMode === d.id ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-[rgba(27,36,51,0.2)] text-ink-soft hover:text-ink"}`}
               >
                 {d.label}
               </button>
@@ -161,7 +161,8 @@ export default function UseEffectPlayground() {
           <div className="flex items-center gap-3 pt-1">
             <button
               onClick={() => setTick((t) => t + 1)}
-              className="px-3.5 py-1.5 rounded-lg text-[13px] font-medium border border-line bg-paper-2 hover:border-line-strong transition-colors"
+              className="px-3.5 py-1.5 rounded-md text-[13px] font-medium text-white transition-colors"
+              style={{ background: accent, boxShadow: "3px 3px 0 0 #1b2433" }}
             >
               force re-render
             </button>

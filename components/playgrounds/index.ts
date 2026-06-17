@@ -2,7 +2,9 @@ import dynamic from "next/dynamic"
 import type { ComponentType } from "react"
 
 // Concepts that have a hands-on interactive sandbox (beyond the walkthrough).
-const registry: Record<string, ComponentType> = {
+// Each takes the concept's accent so its chrome matches the lesson.
+type PlaygroundProps = { accent?: string }
+const registry: Record<string, ComponentType<PlaygroundProps>> = {
   bridge: dynamic(() => import("./BridgePlayground"), { ssr: false }),
   threads: dynamic(() => import("./ThreadsPlayground"), { ssr: false }),
   jsi: dynamic(() => import("./JsiPlayground"), { ssr: false }),
@@ -18,6 +20,6 @@ const registry: Record<string, ComponentType> = {
   startup: dynamic(() => import("./StartupPlayground"), { ssr: false }),
 }
 
-export function getPlayground(conceptId: string): ComponentType | null {
+export function getPlayground(conceptId: string): ComponentType<PlaygroundProps> | null {
   return registry[conceptId] ?? null
 }

@@ -55,7 +55,7 @@ const MemoProfile = memo(ProfileScreen)
 
 const NAMES = ["Ada", "Lin", "Mei", "Rey"]
 
-export default function LifecyclePlayground() {
+export default function LifecyclePlayground({ accent = "#0e7490" }: { accent?: string }) {
   const [mounted, setMounted] = useState(true)
   const [name, setName] = useState(NAMES[0])
   const logRef = useRef<Entry[]>([])
@@ -144,19 +144,19 @@ export default function LifecyclePlayground() {
         </div>
       </div>
 
-      <div className="border-t border-line bg-paper-2 px-5 py-4">
+      <div className="border-t-2 bg-white px-5 py-4" style={{ borderColor: "#1b2433" }}>
         <div className="flex flex-wrap items-center justify-center gap-2.5 mb-3">
           <button
             onClick={toggleMount}
-            className="px-4 py-2 rounded-xl text-white text-sm font-semibold active:scale-95 transition-transform shadow-[0_4px_14px_-6px_rgba(20,158,202,0.6)]"
-            style={{ background: "var(--accent)" }}
+            className="px-4 py-2 rounded-md text-white text-sm font-semibold active:scale-95 transition-transform"
+            style={{ background: accent, boxShadow: "3px 3px 0 0 #1b2433" }}
           >
             {mounted ? "Unmount" : "Mount"}
           </button>
           <button
             onClick={rename}
             disabled={!mounted}
-            className="px-3.5 py-2 rounded-xl text-[13px] font-medium border border-line bg-paper-2 hover:border-line-strong transition-colors disabled:opacity-40"
+            className="px-3.5 py-2 rounded-xl text-[13px] font-medium border border-[rgba(27,36,51,0.2)] bg-paper-2 hover:border-line-strong transition-colors disabled:opacity-40"
           >
             Rename (update)
           </button>
