@@ -18,10 +18,10 @@ const commit = (color = SLATE): DiagramNode => ({ id: "commit", label: "Commit\n
 const layout = (color = SKY): DiagramNode => ({ id: "layout", label: "useLayoutEffect\n(before paint)", x: 210, y: 72, width: 165, height: 52, style: "box", color })
 const paint = (color = GREEN): DiagramNode => ({ id: "paint", label: "Paint", x: 400, y: 175, width: 120, height: 58, style: "box", color })
 const passive = (color = VIOLET): DiagramNode => ({ id: "passive", label: "useEffect\n(after paint)", x: 560, y: 175, width: 150, height: 58, style: "box", color })
-const cleanup = (color = AMBER): DiagramNode => ({ id: "cleanup", label: "cleanup()", x: 560, y: 72, width: 150, height: 52, style: "box", color })
+const cleanup = (color = AMBER): DiagramNode => ({ id: "cleanup", label: "cleanup()", x: 650, y: 72, width: 124, height: 52, style: "box", color })
 const host = (label = "Host views\nFabric C++ · Paper UIManager", color = SLATE): DiagramNode => ({ id: "host", label, x: 320, y: 388, width: 230, height: 54, style: "box", color })
 const update = (color = BLUE): DiagramNode => ({ id: "update", label: "state / prop\nchange", x: 30, y: 300, width: 160, height: 46, style: "pill", color })
-const unmount = (color = RED): DiagramNode => ({ id: "unmount", label: "Unmount", x: 600, y: 300, width: 150, height: 46, style: "pill", color })
+const unmount = (color = RED): DiagramNode => ({ id: "unmount", label: "Unmount", x: 648, y: 300, width: 128, height: 46, style: "pill", color })
 
 const e = (id: string, from: string, to: string, label: string, color = FLOW, dashed = false): DiagramEdge => ({ id, from, to, label, animated: !dashed, dashed, color })
 const an = (text: string, color = "#545b66") => [{ id: "a", text, x: 400, y: 460, color }]
@@ -132,13 +132,13 @@ export const lifecycleSteps: Step[] = [
       { label: "Gotcha", text: "no cleanup means the subscription or interval outlives the screen — a leak, and often a \"can't update state on an unmounted component\" warning. Return a cleanup from every effect that sets something up." },
       { label: "Connects to", text: "a screen that stays mounted underneath a pushed screen — and when it finally unmounts — is the navigation lesson.", link: { href: "/learn/navigation", label: "React Navigation Internals" } },
     ],
-    diagram_state: { nodes: [render(), commit(), host("Host views\nremoving…", RED), layout(), paint(), passive(), cleanup(), unmount()], edges: [e("f1", "render", "commit", ""), e("fLayout", "commit", "layout", "sync"), e("f2", "layout", "paint", "", SETTLE), e("f3", "paint", "passive", "async"), e("fUnmount", "unmount", "cleanup", "run all cleanups", RED, true), e("fRemove", "cleanup", "host", "remove views", RED)], highlighted: ["unmount", "cleanup"], annotations: an("unmount: run every cleanup → remove host views → free memory", RED) },
+    diagram_state: { nodes: [render(), commit(), host("Host views\nremoving…", RED), layout(), paint(), passive(), cleanup(), unmount()], edges: [e("f1", "render", "commit", ""), e("fLayout", "commit", "layout", "sync"), e("f2", "layout", "paint", "", SETTLE), e("f3", "paint", "passive", "async"), e("fUnmount", "unmount", "cleanup", "", RED, true), e("fRemove", "cleanup", "host", "remove views", RED)], highlighted: ["unmount", "cleanup"], annotations: an("unmount: run every cleanup → remove host views → free memory", RED) },
   },
   {
     step: 11,
     caption: "The whole life: render (pure, may re-run) → commit (sync) → useLayoutEffect (before paint) → paint → useEffect (after paint). Update re-runs the loop; unmount runs every cleanup before the views are gone.",
     narration: "So the whole life of a function component: render is pure and may run more than once, commit mutates the host synchronously, layout effects fire before paint, the screen paints, and passive effects fire after. An update re-runs that loop and commits only the diff. Unmount runs every cleanup, then removes the views. All of it is React — the same on both React Native architectures.",
     note: { label: "Next", text: "the synchronous, direct path React uses to mutate native views on the New Architecture is JSI.", link: { href: "/learn/jsi", label: "New Architecture & JSI" } },
-    diagram_state: { nodes: [render(), commit(), host(), layout(), paint(), passive(), cleanup(), update(), unmount()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "host", SETTLE), e("fLayout", "commit", "layout", "sync"), e("f2", "layout", "paint", "", SETTLE), e("f3", "paint", "passive", "async"), e("fUpd", "update", "render", "re-render", WARN, true), e("fUnmount", "unmount", "cleanup", "cleanups", RED, true)], highlighted: [], annotations: an("render → commit → layout effect → paint → passive · update loops · unmount cleans up", GREEN) },
+    diagram_state: { nodes: [render(), commit(), host(), layout(), paint(), passive(), cleanup(), update(), unmount()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "host", SETTLE), e("fLayout", "commit", "layout", "sync"), e("f2", "layout", "paint", "", SETTLE), e("f3", "paint", "passive", "async"), e("fUpd", "update", "render", "re-render", WARN, true), e("fUnmount", "unmount", "cleanup", "", RED, true)], highlighted: [], annotations: an("render → commit → layout effect → paint → passive · update loops · unmount cleans up", GREEN) },
   },
 ]

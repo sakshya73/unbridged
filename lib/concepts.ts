@@ -132,6 +132,7 @@ const style = useAnimatedStyle(() => {
     title: "useState & Re-renders",
     description: "How state changes trigger reconciliation and commits",
     renderer: "ComponentTree",
+    published: true,
     tags: ["hooks", "beginner"],
     analogy:
       "A whiteboard you erase and redraw: change one number and React redraws that board — and the ones below it — to match.",
