@@ -10,6 +10,9 @@ const registry: Record<string, ComponentType> = {
   useeffect: dynamic(() => import("./UseEffectPlayground"), { ssr: false }),
   flatlist: dynamic(() => import("./FlatListPlayground"), { ssr: false }),
   animated: dynamic(() => import("./AnimatedPlayground"), { ssr: false }),
+  lifecycle: dynamic(() => import("./LifecyclePlayground"), { ssr: false }),
+  metro: dynamic(() => import("./MetroPlayground"), { ssr: false }),
+  hermes: dynamic(() => import("./HermesPlayground"), { ssr: false }),
 }
 
 export function getPlayground(conceptId: string): ComponentType | null {

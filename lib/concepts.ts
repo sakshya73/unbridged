@@ -105,6 +105,27 @@ const style = useAnimatedStyle(() => {
       "A stage actor: they walk on (mount), react to cues during the show (update), and exit when the scene ends (unmount) — tidying up props on the way out.",
     scenario:
       "Why a forgotten cleanup leaves a timer or listener running after you've navigated away from a screen.",
+    codeFile: "ProfileScreen.tsx",
+    code: `function ProfileScreen({ name }) {
+  // RENDER PHASE — pure. May run twice (StrictMode) or be thrown away.
+  console.log('render')
+
+  useLayoutEffect(() => {
+    console.log('layout effect')          // after commit, BEFORE paint
+    return () => console.log('layout cleanup')
+  })
+
+  useEffect(() => {
+    console.log('passive effect')         // after paint, async
+    return () => console.log('cleanup')   // before re-run + on unmount
+  }, [name])                              // deps gate the re-run
+
+  return (
+    <View>
+      <Text>{name}</Text>
+    </View>
+  )
+}`,
   },
   {
     id: "usestate",
@@ -207,6 +228,22 @@ function ContactList({ contacts }) {
       "Meal-prepping on Sunday instead of cooking every dish from scratch at dinnertime — the work is done ahead, so serving is instant.",
     scenario:
       "Why turning on Hermes cuts startup time and memory: the JS ships pre-compiled to bytecode instead of being parsed on the phone.",
+    codeFile: "build.sh",
+    code: `# How your JS becomes a Hermes app. The split that matters:
+# everything above the line is BUILD TIME; below it is ON DEVICE.
+
+# 1. Metro stitches every module into one bundle (build machine)
+metro build index.js --out build/bundle.js
+
+# 2. hermesc compiles that bundle AHEAD OF TIME → bytecode
+hermesc -emit-binary -out build/index.hbc build/bundle.js
+#   → ships build/index.hbc inside the app. No JS source on device.
+
+# 3. ON DEVICE: the Hermes VM mmaps index.hbc and runs it —
+hermesVM.run("index.hbc")   # no parse, no compile, no JIT — just execute
+
+# JSC path (the old default, pre-0.70): ship raw bundle.js, then
+#   parse + compile it on device every launch — JIT recompiles hot code.`,
   },
   {
     id: "metro",
@@ -218,6 +255,27 @@ function ContactList({ contacts }) {
       "A printing press that gathers every page (module), formats them, and binds them into one book your app can read.",
     scenario:
       "Why a single 'unable to resolve module' breaks the build — and how Fast Refresh hot-swaps just the file you edited.",
+    codeFile: "bundle.out.js",
+    code: `// ── two source modules (what you wrote) ──────────────────
+// Button.js
+export const Button = ({ label }) => <Text>{label}</Text>
+
+// index.js
+import { Button } from './Button'      // ← Resolution follows this
+
+// ── after Transformation (Babel: JSX + TS → plain JS) ────────
+// JSX above becomes React.createElement(...) calls, types erased
+
+// ── after Serialization (what actually ships) ───────────────
+// runtime prelude defines __r (require), __d (define), __c (clear)
+__d(function (g, _require, _import, module, exports) {
+  exports.Button = (p) => _require(2).createElement(/* … */)
+}, 0, [2]);                            // module id 0 (Button), deps: [2]
+__d(function (g, _require) {
+  const Button = _require(0).Button    // require by NUMERIC id, not path
+}, 1, [0]);                            // module id 1 (index), deps: [0]
+__r(1);                                // boot: run the entry module
+// Metro emits this JS text — hermesc compiles it to bytecode later`,
   },
   {
     id: "navigation",
