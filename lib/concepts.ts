@@ -188,6 +188,7 @@ const MemoRow = React.memo(Row) // same props → React bails out, skips re-rend
   },
   {
     id: "flatlist",
+    published: true,
     title: "FlatList Virtualization",
     description: "How the render window mounts only the rows near the viewport",
     renderer: "ScrollWindow",

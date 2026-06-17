@@ -10,21 +10,17 @@ const SCROLLVIEW_CAP = 2000 // a real ScrollView would mount all N; we cap so th
 const MAX_SCROLL = N * ROW_H - VIEWPORT
 
 // A real row. It reports its own mount/unmount, so the "mounted" count is genuine.
-function Cell({ i, blank, onCount }: { i: number; blank: boolean; onCount: (d: number) => void }) {
+function Cell({ i, onCount }: { i: number; onCount: (d: number) => void }) {
   useEffect(() => {
     onCount(1)
     return () => onCount(-1)
   }, [onCount])
   return (
     <div className="absolute left-0 right-0 px-3 flex items-center border-b border-line" style={{ top: i * ROW_H, height: ROW_H }}>
-      {blank ? (
-        <div className="h-3 w-28 rounded bg-line" />
-      ) : (
-        <div className="flex items-center gap-2.5">
-          <div className="w-5 h-5 rounded-full" style={{ background: `hsl(${(i * 47) % 360} 55% 72%)` }} />
-          <span className="text-[12px] text-ink">Contact #{i}</span>
-        </div>
-      )}
+      <div className="flex items-center gap-2.5">
+        <div className="w-5 h-5 rounded-full" style={{ background: `hsl(${(i * 47) % 360} 55% 72%)` }} />
+        <span className="text-[12px] text-ink">Contact #{i}</span>
+      </div>
     </div>
   )
 }
@@ -34,7 +30,6 @@ export default function FlatListPlayground({ accent = "#0e7490" }: { accent?: st
   const [windowSize, setWindowSize] = useState(3)
   const [scrollTop, setScrollTop] = useState(0)
   const [mounted, setMounted] = useState(0)
-  const [flinging, setFlinging] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const liveRef = useRef(0)
   const rafRef = useRef(0)
@@ -67,22 +62,11 @@ export default function FlatListPlayground({ accent = "#0e7490" }: { accent?: st
   const progress = MAX_SCROLL > 0 ? scrollTop / MAX_SCROLL : 0
   const bandTop = Math.round((RAIL_H - bandH) * progress)
 
-  const fling = () => {
-    const el = scrollRef.current
-    if (!el) return
-    el.scrollTop = Math.min(MAX_SCROLL, el.scrollTop + 4200)
-    setScrollTop(el.scrollTop)
-    if (mode === "flatlist") {
-      setFlinging(true)
-      window.setTimeout(() => setFlinging(false), 170)
-    }
-  }
   const reset = () => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0
     setScrollTop(0)
     setMode("flatlist")
     setWindowSize(3)
-    setFlinging(false)
   }
 
   const heavy = mounted > 100
@@ -118,7 +102,7 @@ export default function FlatListPlayground({ accent = "#0e7490" }: { accent?: st
               <div ref={scrollRef} onScroll={onScroll} className="relative overflow-y-auto" style={{ height: VIEWPORT }}>
                 <div style={{ height: N * ROW_H, position: "relative" }}>
                   {indices.map((i) => (
-                    <Cell key={i} i={i} blank={flinging && mode === "flatlist"} onCount={onCount} />
+                    <Cell key={i} i={i} onCount={onCount} />
                   ))}
                 </div>
               </div>
@@ -166,9 +150,6 @@ export default function FlatListPlayground({ accent = "#0e7490" }: { accent?: st
             ))}
           </div>
 
-          <button onClick={fling} className="px-3.5 py-1.5 rounded-md text-[13px] font-medium text-white transition-transform active:scale-95" style={{ background: accent, boxShadow: "3px 3px 0 0 #1b2433" }}>
-            ⚡ fast fling
-          </button>
           <button onClick={reset} className="px-3 py-1.5 rounded-lg text-[13px] text-ink-soft hover:text-ink hover:bg-ink/5 transition-colors">
             ↺ reset
           </button>
