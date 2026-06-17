@@ -27,8 +27,10 @@ All content is hardcoded. There is no AI call or API key at runtime, so the app 
 ```
 app/
   page.tsx                 home — concept cards
-  learn/[concept]/page.tsx the player (intro card → step walkthrough → optional playground)
-  layout.tsx               fonts + metadata
+  learn/[concept]/page.tsx server route — per-page metadata (generateMetadata) + generateStaticParams; drafts get noindex
+  learn/[concept]/LearnClient.tsx  the "use client" player (intro card → step walkthrough → optional playground)
+  layout.tsx               fonts + root metadata (metadataBase, title template, OG/Twitter, canonical)
+  sitemap.ts / robots.ts   SEO: sitemap lists published /learn/* URLs; robots points to it. Base = NEXT_PUBLIC_SITE_URL
   globals.css              palette, Tailwind theme, .bg-dots / .font-display / .ink-underline
 lib/
   types.ts                 the data model (read this first)

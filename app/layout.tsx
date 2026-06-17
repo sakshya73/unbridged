@@ -20,10 +20,30 @@ const display = Space_Grotesk({
   weight: ["500", "600", "700"],
 })
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.howreactnativeworks.com"
+const DESCRIPTION =
+  "Watch React Native concepts drawn out step by step — the Bridge, JSI, Fabric, Hermes and more. Understand how it works, not just how to use it."
+
 export const metadata: Metadata = {
-  title: "How React Native Works — visual explanations",
-  description:
-    "Watch React Native concepts drawn out step by step — the Bridge, JSI, Fabric, Hermes and more. Understand how it works, not just how to use it.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "How React Native Works — visual explanations",
+    template: "%s · How React Native Works",
+  },
+  description: DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "How React Native Works",
+    title: "How React Native Works — visual explanations",
+    description: DESCRIPTION,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "How React Native Works — visual explanations",
+    description: DESCRIPTION,
+  },
 }
 
 export default function RootLayout({
