@@ -6,6 +6,11 @@ import { concepts } from "@/lib/concepts"
 import { conceptSteps } from "@/lib/data"
 import { accentFor } from "@/lib/accents"
 import { getPlayground } from "@/components/playgrounds"
+import type { ConceptConfig } from "@/lib/types"
+
+// Drafts (no `published` flag) only ever surface in local dev, so the live
+// site keeps showing finished concepts only.
+const SHOW_DRAFTS = process.env.NODE_ENV === "development"
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
@@ -124,8 +129,83 @@ function HeroGraph() {
   )
 }
 
+function ConceptCard({ concept, i, draft = false }: { concept: ConceptConfig; i: number; draft?: boolean }) {
+  const accent = accentFor(concept.id)
+  const level = levelOf(concept.tags)
+  const stepCount = conceptSteps[concept.id]?.length ?? 0
+  const interactive = getPlayground(concept.id) !== null
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0, transition: { duration: 0.45, delay: Math.min(i, 8) * 0.045, ease: EASE } }}
+      whileHover={{ y: -4 }}
+      whileTap={{ scale: 0.985 }}
+      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+    >
+      <Link href={`/learn/${concept.id}`} className="group block h-full">
+        <div
+          className={`relative overflow-hidden rounded-2xl p-5 flex flex-col h-full bg-paper-2 transition-[box-shadow,border-color] duration-300 border ${
+            interactive
+              ? "border-line-strong group-hover:shadow-[0_16px_38px_-16px_var(--card-glow)]"
+              : "border-line group-hover:border-line-strong group-hover:shadow-[0_14px_34px_-14px_var(--card-glow)]"
+          }`}
+          style={{ ["--card-glow" as string]: interactive ? `${accent}59` : "rgba(35,39,47,0.20)" }}
+        >
+          {interactive && (
+            <span className="absolute inset-x-0 top-0 h-[2px]" style={{ background: accent, opacity: 0.9 }} />
+          )}
+
+          <div className={interactive ? "" : "opacity-[0.94] group-hover:opacity-100 transition-opacity"}>
+            <div className="flex items-center justify-between mb-4">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:-rotate-3"
+                style={{ background: `${accent}1A`, boxShadow: `inset 0 0 0 1px ${accent}26` }}
+              >
+                <ConceptGlyph id={concept.id} color={accent} size={22} />
+              </div>
+              <div className="flex items-center gap-1.5">
+                {draft && (
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full text-white" style={{ background: "#D97706" }}>
+                    draft
+                  </span>
+                )}
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full text-ink-faint bg-line inline-flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: level.color }} />
+                  {level.label}
+                </span>
+              </div>
+            </div>
+
+            <h2 className="font-display text-lg font-semibold leading-snug tracking-tight">{concept.title}</h2>
+            <p className="mt-1.5 text-sm text-ink-soft leading-relaxed line-clamp-2 min-h-[2.5rem]">
+              {concept.description}
+            </p>
+          </div>
+
+          <div className="mt-auto pt-3 border-t border-line flex items-center justify-between">
+            <span className="text-xs font-mono text-ink-faint">{stepCount} steps</span>
+            {interactive ? (
+              <span
+                className="inline-flex items-center justify-center w-6 h-6 rounded-full text-sm transition-transform duration-300 group-hover:translate-x-0.5"
+                style={{ color: accent, background: `${accent}14` }}
+              >
+                →
+              </span>
+            ) : (
+              <span className="text-sm text-ink-faint group-hover:text-ink-soft transition-transform duration-300 group-hover:translate-x-0.5">
+                →
+              </span>
+            )}
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  )
+}
+
 export default function Home() {
   const published = concepts.filter((c) => c.published)
+  const drafts = SHOW_DRAFTS ? concepts.filter((c) => !c.published) : []
 
   return (
     <div className="min-h-screen">
@@ -191,74 +271,29 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-5 auto-rows-fr">
-          {published.map((concept, i) => {
-            const accent = accentFor(concept.id)
-            const level = levelOf(concept.tags)
-            const stepCount = conceptSteps[concept.id]?.length ?? 0
-            const interactive = getPlayground(concept.id) !== null
-            return (
-              <motion.div
-                key={concept.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0, transition: { duration: 0.45, delay: Math.min(i, 8) * 0.045, ease: EASE } }}
-                whileHover={{ y: -4 }}
-                whileTap={{ scale: 0.985 }}
-                transition={{ type: "spring", stiffness: 380, damping: 30 }}
-              >
-                <Link href={`/learn/${concept.id}`} className="group block h-full">
-                  <div
-                    className={`relative overflow-hidden rounded-2xl p-5 flex flex-col h-full bg-paper-2 transition-[box-shadow,border-color] duration-300 border ${
-                      interactive
-                        ? "border-line-strong group-hover:shadow-[0_16px_38px_-16px_var(--card-glow)]"
-                        : "border-line group-hover:border-line-strong group-hover:shadow-[0_14px_34px_-14px_var(--card-glow)]"
-                    }`}
-                    style={{ ["--card-glow" as string]: interactive ? `${accent}59` : "rgba(35,39,47,0.20)" }}
-                  >
-                    {interactive && (
-                      <span className="absolute inset-x-0 top-0 h-[2px]" style={{ background: accent, opacity: 0.9 }} />
-                    )}
-
-                    <div className={interactive ? "" : "opacity-[0.94] group-hover:opacity-100 transition-opacity"}>
-                      <div className="flex items-center justify-between mb-4">
-                        <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:-rotate-3"
-                          style={{ background: `${accent}1A`, boxShadow: `inset 0 0 0 1px ${accent}26` }}
-                        >
-                          <ConceptGlyph id={concept.id} color={accent} size={22} />
-                        </div>
-                        <span className="text-[11px] font-mono px-2 py-0.5 rounded-full text-ink-faint bg-line inline-flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full" style={{ background: level.color }} />
-                          {level.label}
-                        </span>
-                      </div>
-
-                      <h2 className="font-display text-lg font-semibold leading-snug tracking-tight">{concept.title}</h2>
-                      <p className="mt-1.5 text-sm text-ink-soft leading-relaxed line-clamp-2 min-h-[2.5rem]">
-                        {concept.description}
-                      </p>
-                    </div>
-
-                    <div className="mt-auto pt-3 border-t border-line flex items-center justify-between">
-                      <span className="text-xs font-mono text-ink-faint">{stepCount} steps</span>
-                      {interactive ? (
-                        <span
-                          className="inline-flex items-center justify-center w-6 h-6 rounded-full text-sm transition-transform duration-300 group-hover:translate-x-0.5"
-                          style={{ color: accent, background: `${accent}14` }}
-                        >
-                          →
-                        </span>
-                      ) : (
-                        <span className="text-sm text-ink-faint group-hover:text-ink-soft transition-transform duration-300 group-hover:translate-x-0.5">
-                          →
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            )
-          })}
+          {published.map((concept, i) => (
+            <ConceptCard key={concept.id} concept={concept} i={i} />
+          ))}
         </div>
+
+        {drafts.length > 0 && (
+          <section className="mt-16">
+            <div className="flex items-end justify-between mb-7">
+              <h2 className="font-mono text-sm text-ink-faint uppercase tracking-[0.12em] inline-flex items-center gap-2">
+                In review
+                <span className="text-[10px] px-2 py-0.5 rounded-full text-white normal-case tracking-normal" style={{ background: "#D97706" }}>
+                  local only
+                </span>
+              </h2>
+              <span className="text-sm text-ink-faint">{drafts.length} drafts · not on the live site</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-5 auto-rows-fr">
+              {drafts.map((concept, i) => (
+                <ConceptCard key={concept.id} concept={concept} i={i} draft />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       <footer className="border-t border-line mt-8">
