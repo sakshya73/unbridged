@@ -162,6 +162,7 @@ const MemoRow = React.memo(Row) // same props → React bails out, skips re-rend
   },
   {
     id: "useeffect",
+    published: true,
     title: "useEffect",
     description: "When it fires, cleanup, and the dependency array",
     renderer: "Timeline",
