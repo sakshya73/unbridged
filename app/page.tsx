@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { useRef } from "react"
+import { motion, useInView, useReducedMotion } from "framer-motion"
 import { concepts } from "@/lib/concepts"
 import { conceptSteps } from "@/lib/data"
 import { accentFor } from "@/lib/accents"
@@ -21,6 +22,13 @@ const levelOf = (tags: string[]) => (tags.includes("advanced") ? "ADV" : tags.in
 // The hero signature: the runtime drawn as an engineering schematic with a
 // title block, leader lines, crosshair part-markers and a dimension line.
 function Schematic() {
+  // Only run the orbiting-dot loop while the hero is on screen (IntersectionObserver,
+  // not a scroll listener) and motion is allowed — so it stops repainting once you
+  // scroll past it, and never runs for prefers-reduced-motion users.
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref)
+  const reduce = useReducedMotion()
+  const animate = !reduce && inView
   const atom = { x: 100, y: 130 }
   const nodes = [
     { x: 300, y: 60, label: "UI" },
@@ -28,7 +36,7 @@ function Schematic() {
     { x: 300, y: 200, label: "NATIVE" },
   ]
   return (
-    <div className="relative border-2 rounded-sm overflow-hidden bg-white" style={{ borderColor: INK }}>
+    <div ref={ref} className="relative border-2 rounded-sm overflow-hidden bg-white" style={{ borderColor: INK }}>
       <div className="flex items-stretch border-b-2 font-mono text-[10px] tracking-[0.14em] uppercase" style={{ borderColor: INK, color: INK }}>
         <div className="px-3 py-1.5 border-r-2" style={{ borderColor: INK }}>Fig. 1 — runtime topology</div>
         <div className="px-3 py-1.5 border-r-2 hidden sm:block" style={{ borderColor: INK }}>scale 1:1</div>
@@ -47,8 +55,8 @@ function Schematic() {
           ))}
           <motion.circle r="3" fill={ACCENT}
             initial={{ cx: atom.x, cy: atom.y }}
-            animate={{ cx: [atom.x, nodes[0].x, atom.x, nodes[2].x], cy: [atom.y, nodes[0].y, atom.y, nodes[2].y] }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} />
+            animate={animate ? { cx: [atom.x, nodes[0].x, atom.x, nodes[2].x], cy: [atom.y, nodes[0].y, atom.y, nodes[2].y] } : { cx: atom.x, cy: atom.y }}
+            transition={animate ? { duration: 5, repeat: Infinity, ease: "easeInOut" } : { duration: 0 }} />
           <g transform={`translate(${atom.x} ${atom.y})`}>
             <circle r="34" fill="none" stroke={INK} strokeWidth="1" strokeDasharray="2 3" />
             <g stroke={ACCENT} strokeWidth="1.6" fill="none">
@@ -101,7 +109,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen" style={{ color: INK, background: "#fbfcfd", backgroundImage: `linear-gradient(${GRID} 1px,transparent 1px),linear-gradient(90deg,${GRID} 1px,transparent 1px)`, backgroundSize: "22px 22px" }}>
-      <nav className="border-b-2 sticky top-0 z-50 backdrop-blur-md" style={{ borderColor: INK, background: "rgba(251,252,253,0.82)" }}>
+      <nav className="border-b-2 sticky top-0 z-50" style={{ borderColor: INK, background: "rgba(251,252,253,0.95)" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between font-mono text-[11px] sm:text-[12px] tracking-[0.14em] uppercase">
           <span className="font-bold truncate">how_react_native_works</span>
           <a href="https://github.com/sakshya73" className="hover:opacity-60 transition-opacity shrink-0">GitHub ↗</a>
