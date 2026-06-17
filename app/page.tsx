@@ -80,51 +80,81 @@ function GitHubIcon() {
   )
 }
 
-// The single hero motif: one source node, two satellites, a packet gliding
-// along each edge. Calm by design — only the packets and a faint breathe move.
+// The hero signature: a small live readout of the runtime. The JS thread (the
+// React atom) dispatches work to the UI, shadow, and native subsystems; a packet
+// glides out along each edge on a calm, staggered loop. One orchestrated moment,
+// deliberately restrained — the rest of the page stays quiet.
+const HERO_NODES = [
+  { id: "ui", x: 288, y: 64, color: "#0891B2", label: "UI THREAD" },
+  { id: "shadow", x: 288, y: 138, color: "#7C3AED", label: "SHADOW" },
+  { id: "native", x: 288, y: 212, color: "#D97706", label: "NATIVE" },
+]
+const labelStyle = { fontFamily: "var(--font-mono), monospace", letterSpacing: "1.5px" } as const
+
 function HeroGraph() {
-  const src = { x: 64, y: 150 }
-  const a = { x: 300, y: 86 }
-  const b = { x: 300, y: 214 }
+  const atom = { x: 92, y: 138 }
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
-      className="relative rounded-2xl border border-line bg-paper-2 bg-dots p-6 shadow-[0_20px_50px_-24px_rgba(35,39,47,0.18)] overflow-hidden"
+      className="relative rounded-2xl border border-line bg-paper-2 shadow-instrument overflow-hidden"
     >
-      <svg viewBox="0 0 360 300" className="w-full">
-        <line x1={src.x} y1={src.y} x2={a.x} y2={a.y} stroke="var(--line-strong)" strokeWidth="1.4" />
-        <line x1={src.x} y1={src.y} x2={b.x} y2={b.y} stroke="var(--line-strong)" strokeWidth="1.4" />
+      {/* instrument header bar */}
+      <div className="flex items-center justify-between px-4 h-9 border-b border-line">
+        <span className="mono-label text-ink-faint">runtime</span>
+        <span className="mono-label inline-flex items-center gap-1.5 text-ink-faint">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full rounded-full opacity-70 motion-safe:animate-ping bg-[#16a34a]" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#16a34a]" />
+          </span>
+          live
+        </span>
+      </div>
 
-        <motion.circle
-          r="3.5"
-          fill="var(--accent)"
-          initial={{ cx: src.x, cy: src.y }}
-          animate={{ cx: [src.x, a.x], cy: [src.y, a.y] }}
-          transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 0.8, ease: "easeInOut" }}
-        />
-        <motion.circle
-          r="3.5"
-          fill="var(--accent)"
-          initial={{ cx: src.x, cy: src.y }}
-          animate={{ cx: [src.x, b.x], cy: [src.y, b.y] }}
-          transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 0.8, ease: "easeInOut", delay: 1.3 }}
-        />
+      {/* instrument body — blueprint grid + a soft accent glow under the atom */}
+      <div className="relative bg-grid">
+        <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(420px 190px at 26% 52%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 72%)" }} />
+        <svg viewBox="0 0 360 276" className="relative w-full">
+          {HERO_NODES.map((n) => (
+            <line key={`e-${n.id}`} x1={atom.x} y1={atom.y} x2={n.x} y2={n.y} stroke="var(--line-strong)" strokeWidth="1.4" />
+          ))}
 
-        <circle cx={src.x} cy={src.y} r="14" fill="none" stroke="var(--accent)" strokeOpacity="0.18" strokeWidth="8" />
-        <circle cx={src.x} cy={src.y} r="13" fill="var(--accent)" />
-        <motion.circle
-          cx={a.x} cy={a.y} r="10" fill="#7C3AED"
-          animate={{ opacity: [0.55, 0.9, 0.55] }}
-          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.circle
-          cx={b.x} cy={b.y} r="10" fill="#059669"
-          animate={{ opacity: [0.55, 0.9, 0.55] }}
-          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
-        />
-      </svg>
+          {HERO_NODES.map((n, i) => (
+            <motion.circle
+              key={`p-${n.id}`}
+              r="3.6"
+              fill={n.color}
+              initial={{ cx: atom.x, cy: atom.y, opacity: 0 }}
+              animate={{ cx: [atom.x, n.x], cy: [atom.y, n.y], opacity: [0, 1, 1, 0] }}
+              transition={{ duration: 2.3, repeat: Infinity, repeatDelay: 1.3, ease: "easeInOut", delay: i * 0.7 }}
+            />
+          ))}
+
+          {HERO_NODES.map((n) => (
+            <g key={`n-${n.id}`}>
+              <motion.circle
+                cx={n.x} cy={n.y} r="11" fill={n.color}
+                animate={{ opacity: [0.62, 0.95, 0.62] }}
+                transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <text x={n.x - 18} y={n.y + 3.5} textAnchor="end" fontSize="9.5" fill="var(--ink-soft)" style={labelStyle}>{n.label}</text>
+            </g>
+          ))}
+
+          {/* the React atom = the JS thread driving it all */}
+          <g transform={`translate(${atom.x} ${atom.y})`}>
+            <circle r="30" fill="none" stroke="var(--accent)" strokeOpacity="0.15" strokeWidth="11" />
+            <g stroke="var(--accent)" strokeWidth="2" fill="none">
+              <ellipse rx="30" ry="11.5" />
+              <ellipse rx="30" ry="11.5" transform="rotate(60)" />
+              <ellipse rx="30" ry="11.5" transform="rotate(-60)" />
+            </g>
+            <circle r="6" fill="var(--accent)" />
+          </g>
+          <text x={atom.x} y={atom.y + 50} textAnchor="middle" fontSize="9.5" fill="var(--ink-soft)" style={labelStyle}>JS · REACT</text>
+        </svg>
+      </div>
     </motion.div>
   )
 }
@@ -183,7 +213,7 @@ function ConceptCard({ concept, i, draft = false }: { concept: ConceptConfig; i:
           </div>
 
           <div className="mt-auto pt-3 border-t border-line flex items-center justify-between">
-            <span className="text-xs font-mono text-ink-faint">{stepCount} steps</span>
+            <span className="mono-label text-ink-faint">{stepCount} steps</span>
             {interactive ? (
               <span
                 className="inline-flex items-center justify-center w-6 h-6 rounded-full text-sm transition-transform duration-300 group-hover:translate-x-0.5"
@@ -230,11 +260,14 @@ export default function Home() {
       <header className="max-w-5xl mx-auto px-6 pt-16 sm:pt-20 pb-16">
         <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-12 lg:gap-10 items-center">
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}>
-            <p className="inline-flex items-center gap-2 text-xs font-mono text-ink-soft mb-6">
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--accent)" }} />
-              React Native, visually
+            <p className="mono-label inline-flex items-center gap-2.5 text-ink-soft mb-7">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full rounded-full opacity-60 motion-safe:animate-ping" style={{ background: "var(--accent)" }} />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: "var(--accent)" }} />
+              </span>
+              React Native · under the hood
             </p>
-            <h1 className="font-display text-[2.75rem] sm:text-6xl lg:text-[3.5rem] font-bold leading-[1.04] tracking-[-0.03em] text-balance">
+            <h1 className="font-display text-[3rem] sm:text-[4rem] lg:text-[4.25rem] font-bold leading-[1.02] tracking-[-0.035em] text-ink-strong text-balance">
               Stop memorizing.
               <br />
               <span className="ink-underline">Actually see</span> how it works.
@@ -266,8 +299,8 @@ export default function Home() {
 
       <main id="concepts" className="max-w-5xl mx-auto px-6 pt-4 pb-24 scroll-mt-20">
         <div className="flex items-end justify-between mb-7">
-          <h2 className="font-mono text-sm text-ink-faint uppercase tracking-[0.12em]">Concepts</h2>
-          <span className="text-sm text-ink-faint">{published.length} live · more coming</span>
+          <h2 className="mono-label text-ink-soft">Concepts</h2>
+          <span className="mono-label text-ink-faint">{published.length} live · more soon</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-5 auto-rows-fr">
