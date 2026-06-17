@@ -80,14 +80,14 @@ export const lifecycleSteps: Step[] = [
       { label: "Key term", term: "useLayoutEffect", text: "an effect that runs synchronously after commit but before paint. Use it for the rare case where you must read or set layout before the user sees the frame — measuring a view, repositioning to avoid a flash." },
       { label: "Gotcha", text: "it blocks the paint, so heavy work here delays the frame the user sees — a dropped frame, visible jank. Reach for it only to avoid a flicker; otherwise use useEffect." },
     ],
-    diagram_state: { nodes: [render(), commit(), host(), layout()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "native views", SETTLE), e("fLayout", "commit", "layout", "before paint · sync")], highlighted: ["layout"], annotations: an("useLayoutEffect: after commit, before paint — synchronous", SKY) },
+    diagram_state: { nodes: [render(), commit(), host(), layout()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "native views", SETTLE), e("fLayout", "commit", "layout", "sync")], highlighted: ["layout"], annotations: an("useLayoutEffect: after commit, before paint — synchronous", SKY) },
   },
   {
     step: 6,
     caption: "Then the device paints the committed frame. This is the first moment the user actually sees the new UI.",
     narration: "Now the device paints. Pixels hit the screen and the user finally sees the result. Everything before this — render, commit, layout effects — happened before a single pixel changed.",
     note: { label: "Key term", term: "Paint", text: "the device drawing the committed frame to the screen. Layout effects run before it; passive effects run after it." },
-    diagram_state: { nodes: [render(), commit(), host(), layout(), paint()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "native views", SETTLE), e("fLayout", "commit", "layout", "before paint · sync"), e("f2", "layout", "paint", "paint", SETTLE)], highlighted: ["paint"], annotations: an("paint = pixels on screen — the first thing the user sees", GREEN) },
+    diagram_state: { nodes: [render(), commit(), host(), layout(), paint()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "native views", SETTLE), e("fLayout", "commit", "layout", "sync"), e("f2", "layout", "paint", "", SETTLE)], highlighted: ["paint"], annotations: an("paint = pixels on screen — the first thing the user sees", GREEN) },
   },
   {
     step: 7,
@@ -99,7 +99,7 @@ export const lifecycleSteps: Step[] = [
       { label: "Try it", text: "in the Playground tab, hit Mount and watch render → layout effect → (paint) → passive effect fire in that real order, then Rename to see cleanup run before setup." },
       { label: "Connects to", text: "when these re-run and how their deps gate that is the whole effects lesson.", link: { href: "/learn/useeffect", label: "useEffect" } },
     ],
-    diagram_state: { nodes: [render(), commit(), host(), layout(), paint(), passive()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "native views", SETTLE), e("fLayout", "commit", "layout", "before paint · sync"), e("f2", "layout", "paint", "paint", SETTLE), e("f3", "paint", "passive", "after paint · async")], highlighted: ["passive"], annotations: an("useEffect: after paint, async — never blocks the frame", VIOLET) },
+    diagram_state: { nodes: [render(), commit(), host(), layout(), paint(), passive()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "native views", SETTLE), e("fLayout", "commit", "layout", "sync"), e("f2", "layout", "paint", "", SETTLE), e("f3", "paint", "passive", "async")], highlighted: ["passive"], annotations: an("useEffect: after paint, async — never blocks the frame", VIOLET) },
   },
   {
     step: 8,
@@ -110,7 +110,7 @@ export const lifecycleSteps: Step[] = [
       { label: "Key term", term: "Update", text: "any render after the first. React diffs the new tree against the old and mutates only the host views that changed — not the whole tree." },
       { label: "Connects to", text: "the enqueue, batch, re-run, reconcile, commit mechanics of an update are the useState lesson.", link: { href: "/learn/usestate", label: "useState & Re-renders" } },
     ],
-    diagram_state: { nodes: [render(), commit(), host(), layout(), paint(), passive(), update()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "native views", SETTLE), e("fLayout", "commit", "layout", "before paint · sync"), e("f2", "layout", "paint", "paint", SETTLE), e("f3", "paint", "passive", "after paint · async"), e("fUpd", "update", "render", "re-render", WARN, true)], highlighted: ["update", "render"], annotations: an("update → re-render → reconcile → commit only the diff", BLUE) },
+    diagram_state: { nodes: [render(), commit(), host(), layout(), paint(), passive(), update()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "native views", SETTLE), e("fLayout", "commit", "layout", "sync"), e("f2", "layout", "paint", "", SETTLE), e("f3", "paint", "passive", "async"), e("fUpd", "update", "render", "re-render", WARN, true)], highlighted: ["update", "render"], annotations: an("update → re-render → reconcile → commit only the diff", BLUE) },
   },
   {
     step: 9,
@@ -121,7 +121,7 @@ export const lifecycleSteps: Step[] = [
       { label: "Key term", term: "cleanup()", text: "the function an effect returns. React runs it before the effect re-runs on a dep change, and once more on unmount. Pair it with setup and nothing leaks." },
       { label: "Connects to", text: "the deps array and the cleanup-before-setup ordering are covered in depth in the effects lesson.", link: { href: "/learn/useeffect", label: "useEffect" } },
     ],
-    diagram_state: { nodes: [render(), commit(), host(), layout(), paint(), passive(), update(), cleanup()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "native views", SETTLE), e("fLayout", "commit", "layout", "before paint · sync"), e("f2", "layout", "paint", "paint", SETTLE), e("f3", "paint", "passive", "after paint · async"), e("fUpd", "update", "render", "re-render", WARN, true), e("fClean", "passive", "cleanup", "returns", WARN, true), e("fRerun", "cleanup", "passive", "then re-run", WARN)], highlighted: ["cleanup", "passive"], annotations: an("dep changed → cleanup() old, then run new setup", AMBER) },
+    diagram_state: { nodes: [render(), commit(), host(), layout(), paint(), passive(), update(), cleanup()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "native views", SETTLE), e("fLayout", "commit", "layout", "sync"), e("f2", "layout", "paint", "", SETTLE), e("f3", "paint", "passive", "async"), e("fUpd", "update", "render", "re-render", WARN, true), e("fClean", "passive", "cleanup", "returns", WARN, true), e("fRerun", "cleanup", "passive", "then re-run", WARN)], highlighted: ["cleanup", "passive"], annotations: an("dep changed → cleanup() old, then run new setup", AMBER) },
   },
   {
     step: 10,
@@ -132,13 +132,13 @@ export const lifecycleSteps: Step[] = [
       { label: "Gotcha", text: "no cleanup means the subscription or interval outlives the screen — a leak, and often a \"can't update state on an unmounted component\" warning. Return a cleanup from every effect that sets something up." },
       { label: "Connects to", text: "a screen that stays mounted underneath a pushed screen — and when it finally unmounts — is the navigation lesson.", link: { href: "/learn/navigation", label: "React Navigation Internals" } },
     ],
-    diagram_state: { nodes: [render(), commit(), host("Host views\nremoving…", RED), layout(), paint(), passive(), cleanup(), unmount()], edges: [e("f1", "render", "commit", ""), e("fLayout", "commit", "layout", "before paint · sync"), e("f2", "layout", "paint", "paint", SETTLE), e("f3", "paint", "passive", "after paint · async"), e("fUnmount", "unmount", "cleanup", "run all cleanups", RED, true), e("fRemove", "cleanup", "host", "remove views", RED)], highlighted: ["unmount", "cleanup"], annotations: an("unmount: run every cleanup → remove host views → free memory", RED) },
+    diagram_state: { nodes: [render(), commit(), host("Host views\nremoving…", RED), layout(), paint(), passive(), cleanup(), unmount()], edges: [e("f1", "render", "commit", ""), e("fLayout", "commit", "layout", "sync"), e("f2", "layout", "paint", "", SETTLE), e("f3", "paint", "passive", "async"), e("fUnmount", "unmount", "cleanup", "run all cleanups", RED, true), e("fRemove", "cleanup", "host", "remove views", RED)], highlighted: ["unmount", "cleanup"], annotations: an("unmount: run every cleanup → remove host views → free memory", RED) },
   },
   {
     step: 11,
     caption: "The whole life: render (pure, may re-run) → commit (sync) → useLayoutEffect (before paint) → paint → useEffect (after paint). Update re-runs the loop; unmount runs every cleanup before the views are gone.",
     narration: "So the whole life of a function component: render is pure and may run more than once, commit mutates the host synchronously, layout effects fire before paint, the screen paints, and passive effects fire after. An update re-runs that loop and commits only the diff. Unmount runs every cleanup, then removes the views. All of it is React — the same on both React Native architectures.",
     note: { label: "Next", text: "the synchronous, direct path React uses to mutate native views on the New Architecture is JSI.", link: { href: "/learn/jsi", label: "New Architecture & JSI" } },
-    diagram_state: { nodes: [render(), commit(), host(), layout(), paint(), passive(), cleanup(), update(), unmount()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "host", SETTLE), e("fLayout", "commit", "layout", "before paint · sync"), e("f2", "layout", "paint", "paint", SETTLE), e("f3", "paint", "passive", "after paint · async"), e("fUpd", "update", "render", "re-render", WARN, true), e("fUnmount", "unmount", "cleanup", "cleanups", RED, true)], highlighted: [], annotations: an("render → commit → layout effect → paint → passive · update loops · unmount cleans up", GREEN) },
+    diagram_state: { nodes: [render(), commit(), host(), layout(), paint(), passive(), cleanup(), update(), unmount()], edges: [e("f1", "render", "commit", ""), e("fHost", "commit", "host", "host", SETTLE), e("fLayout", "commit", "layout", "sync"), e("f2", "layout", "paint", "", SETTLE), e("f3", "paint", "passive", "async"), e("fUpd", "update", "render", "re-render", WARN, true), e("fUnmount", "unmount", "cleanup", "cleanups", RED, true)], highlighted: [], annotations: an("render → commit → layout effect → paint → passive · update loops · unmount cleans up", GREEN) },
   },
 ]

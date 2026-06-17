@@ -293,7 +293,7 @@ export default function LearnPage({ params }: Props) {
             floors it so the diagram barely shifts between steps, and it grows to
             fit long notes instead of clipping them over the seam. */}
         {started && (
-          <div className="border-t-2 bg-white px-5 sm:px-6 py-4 min-h-[128px] sm:h-[184px] flex flex-col justify-center overflow-y-auto" style={{ borderColor: INK }}>
+          <div className="border-t-2 bg-white px-5 sm:px-6 h-[172px] sm:h-[208px] overflow-y-auto" style={{ borderColor: INK }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={index}
@@ -301,7 +301,7 @@ export default function LearnPage({ params }: Props) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.3 }}
-                className="w-full max-w-3xl mx-auto flex flex-col gap-4"
+                className="w-full max-w-3xl mx-auto min-h-full flex flex-col justify-center gap-4 py-4"
               >
                 <p className="font-display text-[17px] leading-relaxed text-center text-balance" style={{ color: INK }}>
                   {caption}
