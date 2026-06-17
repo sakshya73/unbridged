@@ -138,10 +138,11 @@ export default function UseEffectPlayground({ accent = "#0e7490" }: { accent?: s
               <button
                 key={d.id}
                 onClick={() => switchMode(d.id)}
-                className={`flex flex-col items-center px-2.5 py-1 rounded-lg border transition-colors ${depsMode === d.id ? "border-line-strong bg-paper-2 shadow-sm" : "border-[rgba(27,36,51,0.2)] hover:bg-ink/[0.03]"}`}
+                className="flex flex-col items-center px-3 py-1.5 rounded-lg border-2 transition-all"
+                style={depsMode === d.id ? { background: accent, borderColor: accent } : { borderColor: "rgba(27,36,51,0.2)" }}
               >
-                <span className={`text-[12px] font-mono ${depsMode === d.id ? "text-ink" : "text-ink-soft"}`}>{d.label}</span>
-                <span className="text-[9px] text-ink-faint leading-tight">{d.sub}</span>
+                <span className={`text-[12px] font-mono font-semibold ${depsMode === d.id ? "text-white" : "text-ink"}`}>{d.label}</span>
+                <span className={`text-[9px] leading-tight ${depsMode === d.id ? "text-white/80" : "text-ink-faint"}`}>{d.sub}</span>
               </button>
             ))}
           </div>
