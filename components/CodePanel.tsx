@@ -1,23 +1,25 @@
 "use client"
 
+const INK = "#1b2433"
+
 export default function CodePanel({
   code,
   activeLines = [],
   filename = "Example.tsx",
+  accent = "#0e7490",
 }: {
   code: string
   activeLines?: number[]
   filename?: string
+  accent?: string
 }) {
   const lines = code.replace(/\n+$/, "").split("\n")
 
   return (
-    <div className="rounded-xl border border-line bg-paper-2 overflow-hidden shadow-[0_8px_24px_-16px_rgba(35,39,47,0.3)]">
-      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-line bg-[#fbfbf9]">
-        <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#FF5F57" }} />
-        <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#FEBC2E" }} />
-        <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#28C840" }} />
-        <span className="ml-2 text-xs font-mono text-ink-faint">{filename}</span>
+    <div className="rounded-sm border-2 overflow-hidden bg-white" style={{ borderColor: INK }}>
+      <div className="flex items-stretch border-b-2 font-mono text-[10px] tracking-[0.12em] uppercase" style={{ borderColor: INK }}>
+        <span className="px-2.5 py-1.5 border-r-2 font-medium" style={{ borderColor: INK, color: accent }}>src</span>
+        <span className="px-2.5 py-1.5 truncate" style={{ color: "rgba(27,36,51,0.7)" }}>{filename}</span>
       </div>
       <pre className="py-3 text-[11px] sm:text-[12.5px] font-mono leading-[1.7] sm:leading-[1.75] overflow-x-auto">
         {lines.map((ln, i) => {
@@ -28,12 +30,12 @@ export default function CodePanel({
               key={i}
               className="flex transition-colors duration-300"
               style={{
-                background: active ? "color-mix(in srgb, var(--accent) 11%, transparent)" : "transparent",
-                boxShadow: active ? "inset 2px 0 0 var(--accent)" : "none",
+                background: active ? `${accent}1a` : "transparent",
+                boxShadow: active ? `inset 2px 0 0 ${accent}` : "none",
               }}
             >
-              <span className="select-none text-right pr-3 pl-3 w-10 shrink-0 text-ink-faint/70">{n}</span>
-              <span className="pr-4 whitespace-pre text-ink">{ln || " "}</span>
+              <span className="select-none text-right pr-3 pl-3 w-10 shrink-0" style={{ color: "rgba(27,36,51,0.4)" }}>{n}</span>
+              <span className="pr-4 whitespace-pre" style={{ color: INK }}>{ln || " "}</span>
             </div>
           )
         })}

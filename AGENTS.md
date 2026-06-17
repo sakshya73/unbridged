@@ -72,7 +72,7 @@ Each step carries:
 ## Conventions
 
 - **Humanize all reader-facing copy** (analogies, scenarios, captions, narration, notes, README) — strip AI tells before shipping. Vary rhythm, define terms, cut stacked em-dashes.
-- **Light theme only**, modelled on reactnative.dev. Colors come from the CSS variables in `globals.css` (`--accent` is React blue `#149eca`). Per-concept accent colors live in `app/page.tsx`.
+- **Light theme, "Blueprint" identity** — an engineering-drawing look: a faint graph-paper grid surface, 2px ink (`#1b2433`) hairline frames, CAD-style title blocks, part numbers (`RN-01`), corner crosshairs, mono labels. The home (`app/page.tsx`) is accented teal `#0e7490`; each learn page (`app/learn/[concept]/page.tsx`) is "drawn" in that concept's accent (`accentFor` in `lib/accents.ts`), which is also the part-color on the home cards. **Type:** display = Space Grotesk (`.font-display`, all headings), body = Geist, mono = Geist Mono (the schematic-label voice), wired in `layout.tsx` + `globals.css`. The diagram renderer + interactive playgrounds keep the older clean light styling as the "content" inside the Blueprint chrome.
 - **Commits**: conventional style, scoped by area — `feat(content)`, `feat(learn)`, `feat(playground)`, `fix(...)`, `docs(...)`. Commit module by module rather than one giant change.
 - Verify with `npm run build` (it runs the TypeScript check) before committing content changes.
 
