@@ -123,7 +123,7 @@ export default function LifecyclePlayground({ accent = "#0e7490" }: { accent?: s
             <span className="text-[12px] font-semibold text-ink">lifecycle log</span>
             <span className="text-[11px] text-ink-faint font-mono">mounts: {mountsRef.current}</span>
           </div>
-          <div className="flex flex-col gap-1 min-h-[180px]">
+          <div className="flex flex-col gap-1 h-[240px] overflow-hidden">
             <AnimatePresence initial={false}>
               {entries.map((entry) => (
                 <motion.div

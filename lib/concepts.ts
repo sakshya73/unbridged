@@ -97,6 +97,7 @@ const style = useAnimatedStyle(() => {
   },
   {
     id: "lifecycle",
+    published: true,
     title: "Component Lifecycle",
     description: "Mount → render → update → unmount, step by step",
     renderer: "Timeline",

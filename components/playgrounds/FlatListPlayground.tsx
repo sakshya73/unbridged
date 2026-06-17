@@ -1,14 +1,15 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import { motion } from "framer-motion"
 
 const N = 10000
 const ROW_H = 36
-const VIEWPORT = 300
+const VIEWPORT = 320
 const SCROLLVIEW_CAP = 2000 // a real ScrollView would mount all N; we cap so the browser survives
+const MAX_SCROLL = N * ROW_H - VIEWPORT
 
-// A real row component. It reports its own mount/unmount, so the "mounted cells"
-// badge counts genuine live components — not a number we made up.
+// A real row. It reports its own mount/unmount, so the "mounted" count is genuine.
 function Cell({ i, blank, onCount }: { i: number; blank: boolean; onCount: (d: number) => void }) {
   useEffect(() => {
     onCount(1)
@@ -58,10 +59,18 @@ export default function FlatListPlayground({ accent = "#0e7490" }: { accent?: st
   const indices: number[] = []
   for (let i = start; i < end; i++) indices.push(i)
 
+  // minimap: the mounted window as a band sliding through the full list.
+  // height is exaggerated (sqrt) so a ~30-of-10,000 window is still visible.
+  const RAIL_H = VIEWPORT
+  const winRows = end - start
+  const bandH = Math.max(8, Math.round(RAIL_H * Math.sqrt(winRows / N)))
+  const progress = MAX_SCROLL > 0 ? scrollTop / MAX_SCROLL : 0
+  const bandTop = Math.round((RAIL_H - bandH) * progress)
+
   const fling = () => {
     const el = scrollRef.current
     if (!el) return
-    el.scrollTop = Math.min(N * ROW_H - VIEWPORT, el.scrollTop + 4200)
+    el.scrollTop = Math.min(MAX_SCROLL, el.scrollTop + 4200)
     setScrollTop(el.scrollTop)
     if (mode === "flatlist") {
       setFlinging(true)
@@ -76,29 +85,57 @@ export default function FlatListPlayground({ accent = "#0e7490" }: { accent?: st
     setFlinging(false)
   }
 
+  const heavy = mounted > 100
+  const insight =
+    mode === "scrollview"
+      ? `ScrollView mounts every row up front — ${mounted.toLocaleString()} live components at once (capped at ${SCROLLVIEW_CAP.toLocaleString()}; a real one mounts all ${N.toLocaleString()}). The count explodes and scrolling stutters.`
+      : `Only ${mounted} of ${N.toLocaleString()} rows exist right now. Scroll — the window slides (watch the row range and the rail), but the count barely moves. windowSize ${windowSize} sets how much off-screen buffer to keep.`
+
   return (
     <div className="w-full flex-1 min-h-0 flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center gap-3 px-6 py-5">
-        <div className="inline-flex items-center gap-2 rounded-full border border-line bg-paper-2 px-3.5 py-1.5">
-          <span className="text-[12px] text-ink-soft">mounted cells</span>
-          <span className="font-mono font-bold text-base" style={{ color: mounted > 100 ? "#DC2626" : "#059669" }}>
-            {mounted.toLocaleString()}
+        {/* readout */}
+        <div className="flex items-center gap-5">
+          <div className="inline-flex items-baseline gap-1.5">
+            <span className="text-[11px] uppercase tracking-wider text-ink-faint mr-1">mounted</span>
+            <motion.span key={mounted} initial={{ scale: 1.25, opacity: 0.6 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 380, damping: 20 }} className="font-mono font-bold text-2xl tabular-nums" style={{ color: heavy ? "#DC2626" : accent }}>
+              {mounted.toLocaleString()}
+            </motion.span>
+            <span className="text-[12px] text-ink-faint">/ {N.toLocaleString()}</span>
+          </div>
+          <span className="text-[12px] font-mono text-ink-soft">
+            window: rows <b className="text-ink">{start}</b>–<b className="text-ink">{Math.max(start, end - 1)}</b>
           </span>
-          <span className="text-[11px] text-ink-faint">/ {N.toLocaleString()} rows</span>
         </div>
 
-        <div className="relative w-[230px] rounded-[28px] bg-ink p-2.5 shadow-[0_20px_50px_-18px_rgba(35,39,47,0.45)]">
-          <div className="rounded-[22px] bg-paper overflow-hidden">
-            <div className="py-2 text-center border-b border-line bg-paper-2">
-              <p className="font-semibold text-[13px]">Contacts</p>
-            </div>
-            <div ref={scrollRef} onScroll={onScroll} className="relative overflow-y-auto" style={{ height: VIEWPORT }}>
-              <div style={{ height: N * ROW_H, position: "relative" }}>
-                {indices.map((i) => (
-                  <Cell key={i} i={i} blank={flinging && mode === "flatlist"} onCount={onCount} />
-                ))}
+        <div className="flex items-stretch gap-3">
+          {/* phone */}
+          <div className="relative w-[230px] rounded-[28px] bg-ink p-2.5 shadow-[0_20px_50px_-18px_rgba(35,39,47,0.45)]">
+            <div className="rounded-[22px] bg-paper overflow-hidden">
+              <div className="py-2 text-center border-b border-line bg-paper-2">
+                <p className="font-semibold text-[13px]">Contacts</p>
+              </div>
+              <div ref={scrollRef} onScroll={onScroll} className="relative overflow-y-auto" style={{ height: VIEWPORT }}>
+                <div style={{ height: N * ROW_H, position: "relative" }}>
+                  {indices.map((i) => (
+                    <Cell key={i} i={i} blank={flinging && mode === "flatlist"} onCount={onCount} />
+                  ))}
+                </div>
               </div>
             </div>
+          </div>
+
+          {/* minimap rail — the mounted window inside the full 10k list */}
+          <div className="flex flex-col items-center gap-1.5 pt-9">
+            <div className="relative w-2.5 rounded-full bg-ink/[0.06] overflow-hidden" style={{ height: RAIL_H }}>
+              <motion.div
+                className="absolute left-0 right-0 rounded-full"
+                style={{ background: accent }}
+                animate={{ top: bandTop, height: bandH }}
+                transition={{ type: "tween", duration: 0.15 }}
+              />
+            </div>
+            <span className="text-[9px] font-mono text-ink-faint text-center leading-tight w-12">live<br />window</span>
           </div>
         </div>
       </div>
@@ -106,16 +143,10 @@ export default function FlatListPlayground({ accent = "#0e7490" }: { accent?: st
       <div className="border-t-2 bg-white px-5 py-4" style={{ borderColor: "#1b2433" }}>
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2.5 mb-3">
           <div className="flex bg-ink/[0.05] rounded-lg p-0.5 text-sm">
-            <button
-              onClick={() => setMode("flatlist")}
-              className={`px-3 py-1 rounded-md transition-all ${mode === "flatlist" ? "bg-paper-2 text-ink font-medium shadow-sm" : "text-ink-soft hover:text-ink"}`}
-            >
+            <button onClick={() => setMode("flatlist")} className="px-3 py-1 rounded-md transition-all" style={mode === "flatlist" ? { background: accent, color: "#fff", fontWeight: 600 } : { color: "var(--ink-soft)" }}>
               FlatList
             </button>
-            <button
-              onClick={() => setMode("scrollview")}
-              className={`px-3 py-1 rounded-md transition-all ${mode === "scrollview" ? "bg-paper-2 text-ink font-medium shadow-sm" : "text-ink-soft hover:text-ink"}`}
-            >
+            <button onClick={() => setMode("scrollview")} className="px-3 py-1 rounded-md transition-all" style={mode === "scrollview" ? { background: "#DC2626", color: "#fff", fontWeight: 600 } : { color: "var(--ink-soft)" }}>
               ScrollView
             </button>
           </div>
@@ -127,14 +158,15 @@ export default function FlatListPlayground({ accent = "#0e7490" }: { accent?: st
                 key={w}
                 onClick={() => setWindowSize(w)}
                 disabled={mode === "scrollview"}
-                className={`w-7 h-7 rounded-lg text-[12px] font-mono border transition-colors disabled:opacity-40 ${windowSize === w ? "border-line-strong bg-paper-2 text-ink shadow-sm" : "border-[rgba(27,36,51,0.2)] text-ink-soft hover:text-ink"}`}
+                className="w-8 h-8 rounded-md text-[13px] font-mono font-semibold border-2 transition-all disabled:opacity-40"
+                style={windowSize === w ? { background: accent, borderColor: accent, color: "#fff" } : { borderColor: "rgba(27,36,51,0.2)", color: "var(--ink-soft)" }}
               >
                 {w}
               </button>
             ))}
           </div>
 
-          <button onClick={fling} className="px-3.5 py-1.5 rounded-md text-[13px] font-medium text-white transition-colors" style={{ background: accent, boxShadow: "3px 3px 0 0 #1b2433" }}>
+          <button onClick={fling} className="px-3.5 py-1.5 rounded-md text-[13px] font-medium text-white transition-transform active:scale-95" style={{ background: accent, boxShadow: "3px 3px 0 0 #1b2433" }}>
             ⚡ fast fling
           </button>
           <button onClick={reset} className="px-3 py-1.5 rounded-lg text-[13px] text-ink-soft hover:text-ink hover:bg-ink/5 transition-colors">
@@ -142,16 +174,11 @@ export default function FlatListPlayground({ accent = "#0e7490" }: { accent?: st
           </button>
         </div>
 
-        <p className="text-center text-sm text-ink-soft max-w-2xl mx-auto leading-relaxed">
-          Scroll the list — in <b className="text-ink">FlatList</b> mode the mounted count stays tiny no matter how far you
-          go. Flip to <b className="text-ink">ScrollView</b> and it jumps to thousands (and the scroll stutters). Hit{" "}
-          <b className="text-ink">fast fling</b> to catch blank cells when the JS thread falls behind.
-        </p>
+        <p className="text-center text-sm text-ink-soft max-w-2xl mx-auto leading-relaxed">{insight}</p>
         <p className="mt-2 text-center text-[12px] text-ink-faint max-w-2xl mx-auto leading-relaxed">
-          Real browser React — only rows inside the window are mounted, positioned by computed offsets (the in-browser twin
-          of getItemLayout), and the badge counts live components for real via mount/unmount effects. ScrollView is capped
-          at {SCROLLVIEW_CAP.toLocaleString()} so your browser survives; a real one mounts all {N.toLocaleString()}. The blank-cell
-          fling briefly blanks the visible rows (~170ms) to make a normally sub-frame race visible.
+          Real browser React — the count is live mounted components (via mount/unmount effects), not a number we made up. Scroll keeps it ~constant
+          (that&apos;s virtualization); <b className="text-ink">windowSize</b> changes the buffer; <b className="text-ink">ScrollView</b> mounts everything.
+          The rail&apos;s window height is exaggerated so a ~30-of-10,000 sliver stays visible.
         </p>
       </div>
     </div>
